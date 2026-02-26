@@ -17,14 +17,14 @@
 
             <input type="text" name="mobile" placeholder="Mobile Number" required>
 
-            <div class="pw-password-field">
+            <div class="pw-input-group">
                 <input type="password" name="password" id="pw_reg_pass" placeholder="Password" required>
-                <span onclick="toggleRegPass()">👁</span>
+                <span class="pw-eye" onclick="toggleRegPass()">👁</span>
             </div>
 
-            <div class="pw-password-field">
+            <div class="pw-input-group">
                 <input type="password" name="confirm_password" id="pw_reg_confirm" placeholder="Confirm Password" required>
-                <span onclick="toggleRegConfirm()">👁</span>
+                <span class="pw-eye" onclick="toggleRegConfirm()">👁</span>
             </div>
 
             <button type="submit" class="pw-auth-btn">Create Account</button>
@@ -36,6 +36,7 @@
         </p>
 
     </div>
+
 </div>
 
 <script>
