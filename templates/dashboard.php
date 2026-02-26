@@ -2,11 +2,12 @@
 if (!is_user_logged_in()) return;
 
 global $wpdb;
+
 $user_id = get_current_user_id();
 
 /*
 |--------------------------------------------------------------------------
-| FETCH ACTIVE PROPERTIES ONLY
+| FETCH ACTIVE PROPERTIES
 |--------------------------------------------------------------------------
 */
 
@@ -15,122 +16,213 @@ $properties = $wpdb->get_results(
         "SELECT * FROM {$wpdb->prefix}pw_properties 
          WHERE user_id = %d 
          AND subscription_status IN 
-         ('Active Subscription','Visit Scheduled','Visit Completed')
+         ('Active Subscription','Visit Scheduled','Completed')
          ORDER BY id DESC",
         $user_id
     )
 );
 ?>
 
-<h2>Dashboard</h2>
+<h2>My Properties</h2>
 
-<div class="pw-grid">
+<?php if (!empty($properties)) : ?>
 
-<?php if ($properties): ?>
-<?php foreach ($properties as $prop): ?>
+<?php foreach ($properties as $prop) : ?>
 
-    <?php
-    // Status Badge Class
-    $status_class = 'pw-pending';
+<?php
+/* ================= STATUS BADGE ================= */
 
-    if ($prop->subscription_status == 'Active Subscription') {
-        $status_class = 'pw-active';
-    }
-    elseif ($prop->subscription_status == 'Visit Scheduled') {
-        $status_class = 'pw-warning';
-    }
-    elseif ($prop->subscription_status == 'Visit Completed') {
-        $status_class = 'pw-active';
-    }
+$status_class = 'pw-status-pending';
 
-    // Fetch latest subscription
-    $subscription = $wpdb->get_row(
-        $wpdb->prepare(
-            "SELECT * FROM {$wpdb->prefix}pw_subscriptions 
-             WHERE property_id = %d 
-             ORDER BY id DESC LIMIT 1",
-            $prop->id
-        )
-    );
+if ($prop->subscription_status === 'Active Subscription') {
+    $status_class = 'pw-status-active';
+}
+elseif ($prop->subscription_status === 'Visit Scheduled') {
+    $status_class = 'pw-status-warning';
+}
+elseif ($prop->subscription_status === 'Completed') {
+    $status_class = 'pw-status-completed';
+}
 
-    // Fetch latest visit log
-    $visit = $wpdb->get_row(
-        $wpdb->prepare(
-            "SELECT * FROM {$wpdb->prefix}pw_property_logs 
-             WHERE property_id = %d 
-             ORDER BY id DESC LIMIT 1",
-            $prop->id
-        )
-    );
-    ?>
+/* ================= LATEST SUBSCRIPTION ================= */
 
-    <div class="pw-card">
+$subscription = $wpdb->get_row(
+    $wpdb->prepare(
+        "SELECT * FROM {$wpdb->prefix}pw_subscriptions 
+         WHERE property_id = %d 
+         ORDER BY id DESC LIMIT 1",
+        $prop->id
+    )
+);
 
-        <h3><?php echo esc_html($prop->property_name); ?></h3>
+/* ================= UPCOMING VISIT ================= */
 
-        <p><strong>Property ID:</strong> 
-            <?php echo esc_html($prop->property_code); ?>
-        </p>
+$upcoming_visit = $wpdb->get_row(
+    $wpdb->prepare(
+        "SELECT v.*, u.display_name AS engineer_name
+         FROM {$wpdb->prefix}pw_visits v
+         LEFT JOIN {$wpdb->users} u ON v.engineer_id = u.ID
+         WHERE v.property_id = %d
+         ORDER BY v.visit_date ASC LIMIT 1",
+        $prop->id
+    )
+);
 
-        <p>
-            <span class="pw-badge <?php echo $status_class; ?>">
-                <?php echo esc_html($prop->subscription_status); ?>
-            </span>
-        </p>
+/* ================= VISIT HISTORY ================= */
 
-        <?php if ($subscription): ?>
-            <p><strong>Package:</strong> 
-                <?php echo esc_html($subscription->package_type); ?>
+$visit_history = $wpdb->get_results(
+    $wpdb->prepare(
+        "SELECT v.*, u.display_name AS engineer_name
+         FROM {$wpdb->prefix}pw_visits v
+         LEFT JOIN {$wpdb->users} u ON v.engineer_id = u.ID
+         WHERE v.property_id = %d
+         ORDER BY v.visit_date DESC LIMIT 5",
+        $prop->id
+    )
+);
+?>
+
+<div class="pw-rectangle" style="margin-bottom:30px;">
+
+    <h3><?php echo esc_html($prop->property_name); ?></h3>
+
+    <div class="pw-grid-3">
+
+        <div>
+            <strong>Property ID</strong>
+            <p><?php echo esc_html($prop->property_code); ?></p>
+        </div>
+
+        <div>
+            <strong>Location</strong>
+            <p><?php echo esc_html($prop->location_name); ?></p>
+        </div>
+
+        <div>
+            <strong>Status</strong>
+            <p>
+                <span class="pw-status-badge <?php echo esc_attr($status_class); ?>">
+                    <?php echo esc_html($prop->subscription_status); ?>
+                </span>
             </p>
-
-            <p><strong>Start:</strong> 
-                <?php echo esc_html($subscription->start_date); ?>
-            </p>
-
-            <p><strong>End:</strong> 
-                <?php echo esc_html($subscription->end_date); ?>
-            </p>
-        <?php endif; ?>
-
-        <?php if ($visit): ?>
-            <p><strong>Last Visit:</strong> 
-                <?php echo esc_html($visit->created_at); ?>
-            </p>
-        <?php endif; ?>
-
-        <button class="pw-small-btn"
-        onclick="openModal(`
-            <h2><?php echo esc_html($prop->property_name); ?></h2>
-            <p><strong>ID:</strong> <?php echo esc_html($prop->property_code); ?></p>
-            <p><strong>Status:</strong> <?php echo esc_html($prop->subscription_status); ?></p>
-            <hr>
-            <h3>Property Details</h3>
-            <p><strong>Location:</strong> <?php echo esc_html($prop->location_name); ?></p>
-            <p><strong>Address:</strong> <?php echo esc_html($prop->address); ?></p>
-            <p><strong>Plot Size:</strong> <?php echo esc_html($prop->plot_size); ?></p>
-            <hr>
-            <?php if ($subscription): ?>
-                <h3>Subscription</h3>
-                <p><strong>Package:</strong> <?php echo esc_html($subscription->package_type); ?></p>
-                <p><strong>Start Date:</strong> <?php echo esc_html($subscription->start_date); ?></p>
-                <p><strong>End Date:</strong> <?php echo esc_html($subscription->end_date); ?></p>
-                <p><strong>Cost:</strong> ₹<?php echo esc_html($subscription->cost); ?></p>
-            <?php endif; ?>
-            <?php if ($visit): ?>
-                <hr>
-                <h3>Latest Visit</h3>
-                <p><strong>Date:</strong> <?php echo esc_html($visit->created_at); ?></p>
-                <p><strong>Comment:</strong> <?php echo esc_html($visit->comment); ?></p>
-            <?php endif; ?>
-        `)">
-        View Details
-        </button>
+        </div>
 
     </div>
 
-<?php endforeach; ?>
-<?php else: ?>
-    <p>No active properties.</p>
-<?php endif; ?>
+    <?php if ($subscription) : ?>
+
+    <hr>
+
+    <h4>Subscription Details</h4>
+
+    <div class="pw-grid-3">
+
+        <div>
+            <strong>Package</strong>
+            <p><?php echo esc_html($subscription->package_type); ?></p>
+        </div>
+
+        <div>
+            <strong>Start Date</strong>
+            <p><?php echo esc_html(date('d-m-Y', strtotime($subscription->start_date))); ?></p>
+        </div>
+
+        <div>
+            <strong>End Date</strong>
+            <p><?php echo esc_html(date('d-m-Y', strtotime($subscription->end_date))); ?></p>
+        </div>
+
+    </div>
+
+    <?php endif; ?>
+
+
+    <?php if ($upcoming_visit) : ?>
+
+    <hr>
+
+    <h4>Next Visit</h4>
+
+    <div class="pw-grid-3">
+
+        <div>
+            <strong>Visit Date</strong>
+            <p><?php echo esc_html(date('d-m-Y', strtotime($upcoming_visit->visit_date))); ?></p>
+        </div>
+
+        <div>
+            <strong>Engineer</strong>
+            <p><?php echo esc_html($upcoming_visit->engineer_name); ?></p>
+        </div>
+
+        <div>
+            <strong>Status</strong>
+            <p><?php echo esc_html($upcoming_visit->status); ?></p>
+        </div>
+
+    </div>
+
+    <?php if (!empty($upcoming_visit->report_file)) : ?>
+        <p>
+            <strong>Report:</strong> 
+            <a href="<?php echo esc_url($upcoming_visit->report_file); ?>" target="_blank">
+                View Report
+            </a>
+        </p>
+    <?php endif; ?>
+
+    <?php endif; ?>
+
+
+    <?php if (!empty($visit_history)) : ?>
+
+    <hr>
+
+    <h4>Recent Visits</h4>
+
+    <table class="pw-table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Engineer</th>
+                <th>Status</th>
+                <th>Report</th>
+            </tr>
+        </thead>
+        <tbody>
+
+        <?php foreach ($visit_history as $visit) : ?>
+
+            <tr>
+                <td><?php echo esc_html(date('d-m-Y', strtotime($visit->visit_date))); ?></td>
+                <td><?php echo esc_html($visit->engineer_name); ?></td>
+                <td><?php echo esc_html($visit->status); ?></td>
+                <td>
+                    <?php if (!empty($visit->report_file)) : ?>
+                        <a href="<?php echo esc_url($visit->report_file); ?>" target="_blank">
+                            View
+                        </a>
+                    <?php else : ?>
+                        -
+                    <?php endif; ?>
+                </td>
+            </tr>
+
+        <?php endforeach; ?>
+
+        </tbody>
+    </table>
+
+    <?php endif; ?>
 
 </div>
+
+<?php endforeach; ?>
+
+<?php else : ?>
+
+<div class="pw-success-box">
+    No active properties found.
+</div>
+
+<?php endif; ?>

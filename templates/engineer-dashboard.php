@@ -2,123 +2,90 @@
 if (!is_user_logged_in()) return;
 
 $user = wp_get_current_user();
-if (!in_array('engineer', $user->roles)) wp_die('Unauthorized');
 
-global $wpdb;
-
-/* HANDLE VISIT SUBMIT */
-if (isset($_POST['pw_engineer_report'])) {
-
-    if (!wp_verify_nonce($_POST['_wpnonce'], 'pw_engineer_report_nonce')) {
-        wp_die('Security failed');
-    }
-
-    $property_id = intval($_POST['property_id']);
-    $comment     = sanitize_textarea_field($_POST['comment']);
-    $media_url   = '';
-
-    if (!empty($_FILES['media_file']['name'])) {
-        require_once(ABSPATH . 'wp-admin/includes/file.php');
-        $uploaded = wp_handle_upload($_FILES['media_file'], ['test_form'=>false]);
-        if (!isset($uploaded['error'])) {
-            $media_url = $uploaded['url'];
-        }
-    }
-
-    $wpdb->insert(
-        $wpdb->prefix . 'pw_property_logs',
-        [
-            'property_id' => $property_id,
-            'engineer_id' => $user->ID,
-            'visit_date'  => current_time('Y-m-d'),
-            'comment'     => $comment,
-            'media_url'   => $media_url,
-            'visit_status'=> 'Completed',
-            'created_at'  => current_time('mysql')
-        ]
-    );
-
-    $wpdb->update(
-        $wpdb->prefix . 'pw_properties',
-        ['subscription_status' => 'Visit Completed'],
-        ['id' => $property_id]
-    );
-
-    echo "<div class='pw-success'>Visit Completed Successfully</div>";
+if (!in_array('engineer', (array) $user->roles)) {
+    wp_die('Unauthorized');
 }
 
-/* FETCH ASSIGNED */
-$rows = $wpdb->get_results(
+global $wpdb;
+$engineer_id = $user->ID;
+
+/* ============================================
+   FETCH ASSIGNED VISITS
+============================================ */
+
+$visits = $wpdb->get_results(
     $wpdb->prepare(
-        "SELECT * FROM {$wpdb->prefix}pw_properties
-         WHERE assigned_engineer = %d
-         AND subscription_status IN ('Active Subscription','Visit Scheduled')",
-        $user->ID
+        "SELECT v.*, p.property_code, p.property_name, p.location_name
+         FROM {$wpdb->prefix}pw_visits v
+         LEFT JOIN {$wpdb->prefix}pw_properties p
+         ON v.property_id = p.id
+         WHERE v.engineer_id = %d
+         ORDER BY v.visit_date ASC",
+        $engineer_id
     )
 );
 ?>
 
-<h2>Assigned Properties</h2>
+<h2>Engineer Dashboard</h2>
 
-<?php if ($rows): ?>
+<?php if (!empty($visits)): ?>
 
 <table class="pw-table">
 <tr>
-<th>ID</th>
-<th>Name</th>
+<th>Property ID</th>
+<th>Property</th>
+<th>Location</th>
+<th>Visit Date</th>
 <th>Status</th>
 <th>Action</th>
 </tr>
 
-<?php foreach ($rows as $row): ?>
+<?php foreach ($visits as $visit): ?>
+
 <tr>
-<td><?php echo esc_html($row->property_code); ?></td>
-<td><?php echo esc_html($row->property_name); ?></td>
-<td><?php echo esc_html($row->subscription_status); ?></td>
+<td><?php echo esc_html($visit->property_code); ?></td>
+<td><?php echo esc_html($visit->property_name); ?></td>
+<td><?php echo esc_html($visit->location_name); ?></td>
+<td><?php echo esc_html($visit->visit_date); ?></td>
+
 <td>
-<button class="pw-small-btn"
-onclick="pwOpenEngineerModal(<?php echo $row->id; ?>)">
-Open
-</button>
+<span class="pw-status-badge 
+<?php echo $visit->status === 'Completed' ? 'pw-status-completed' : 'pw-status-warning'; ?>">
+<?php echo esc_html($visit->status); ?>
+</span>
 </td>
+
+<td>
+
+<?php if ($visit->status !== 'Completed'): ?>
+
+<a href="<?php echo esc_url(home_url('/update-visit?visit_id=' . intval($visit->id))); ?>" 
+class="pw-small-btn">
+Update
+</a>
+
+<?php else: ?>
+
+<a href="<?php echo esc_url(home_url('/update-visit?visit_id=' . intval($visit->id))); ?>" 
+class="pw-small-btn">
+View
+</a>
+
+<?php endif; ?>
+
+</td>
+
 </tr>
+
 <?php endforeach; ?>
+
 </table>
 
 <?php else: ?>
-<p>No assigned properties.</p>
+
+<div class="pw-success-box">
+No assigned visits.
+</div>
+
 <?php endif; ?>
-
-<!-- ENGINEER MODAL -->
-<div id="pwEngineerModal" class="pw-modal" style="display:none;">
-<div class="pw-modal-content">
-
-<span class="pw-close" onclick="pwCloseEngineerModal()">&times;</span>
-
-<h3>Submit Visit Report</h3>
-
-<form method="post" enctype="multipart/form-data">
-<?php wp_nonce_field('pw_engineer_report_nonce'); ?>
-<input type="hidden" name="pw_engineer_report" value="1">
-<input type="hidden" name="property_id" id="pw_property_id">
-
-<textarea name="comment" placeholder="Work comments..." required style="width:100%;margin-bottom:10px;"></textarea>
-
-<input type="file" name="media_file" style="margin-bottom:10px;">
-
-<button type="submit" class="pw-small-btn">Mark Visit Completed</button>
-</form>
-
-</div>
-</div>
-
-<script>
-function pwOpenEngineerModal(id){
-    document.getElementById("pw_property_id").value = id;
-    document.getElementById("pwEngineerModal").style.display = "block";
-}
-
-function pwCloseEngineerModal(){
-    document.getElementById("pwEngineerModal").style.display = "none";
-}
-</script>

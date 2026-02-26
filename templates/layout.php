@@ -4,18 +4,22 @@ if (!is_user_logged_in()) {
     exit;
 }
 
-$user = wp_get_current_user();
+$user  = wp_get_current_user();
 $roles = (array) $user->roles;
 $role  = !empty($roles) ? $roles[0] : '';
+
+$tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : '';
 ?>
 
 <!DOCTYPE html>
-<html>
+<html <?php language_attributes(); ?>>
 <head>
-<meta charset="UTF-8">
+<meta charset="<?php bloginfo('charset'); ?>">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <?php wp_head(); ?>
 </head>
-<body>
+
+<body <?php body_class(); ?>>
 
 <div class="pw-app">
 
@@ -30,61 +34,58 @@ $role  = !empty($roles) ? $roles[0] : '';
 
         <?php if ($role === 'customer'): ?>
 
-            <a href="<?php echo home_url('/customer-dashboard'); ?>"
-               class="<?php if(is_page('customer-dashboard') && !isset($_GET['tab'])) echo 'active'; ?>">
+            <a href="<?php echo esc_url(home_url('/customer-dashboard')); ?>"
+               class="<?php echo (is_page('customer-dashboard') && empty($tab)) ? 'active' : ''; ?>">
                Dashboard
             </a>
 
-            <a href="<?php echo home_url('/add-property'); ?>"
-               class="<?php if(is_page('add-property')) echo 'active'; ?>">
+            <a href="<?php echo esc_url(home_url('/add-property')); ?>"
+               class="<?php echo is_page('add-property') ? 'active' : ''; ?>">
                Add Property
             </a>
 
-            <a href="<?php echo home_url('/customer-dashboard?tab=my-properties'); ?>"
-               class="<?php if(isset($_GET['tab']) && $_GET['tab'] === 'my-properties') echo 'active'; ?>">
+            <a href="<?php echo esc_url(home_url('/customer-dashboard?tab=my-properties')); ?>"
+               class="<?php echo ($tab === 'my-properties') ? 'active' : ''; ?>">
                My Properties
             </a>
 
-            <a href="<?php echo home_url('/customer-profile'); ?>"
-               class="<?php if(is_page('customer-profile')) echo 'active'; ?>">
+            <a href="<?php echo esc_url(home_url('/customer-profile')); ?>"
+               class="<?php echo is_page('customer-profile') ? 'active' : ''; ?>">
                Profile
             </a>
 
         <?php elseif ($role === 'operation_member'): ?>
 
-            <a href="<?php echo home_url('/operation-dashboard'); ?>"
-               class="<?php if(is_page('operation-dashboard') && !isset($_GET['tab'])) echo 'active'; ?>">
+            <a href="<?php echo esc_url(home_url('/operation-dashboard')); ?>"
+               class="<?php echo (is_page('operation-dashboard') && empty($tab)) ? 'active' : ''; ?>">
                Dashboard
             </a>
 
-            <a href="<?php echo home_url('/operation-dashboard?tab=new'); ?>"
-               class="<?php if(isset($_GET['tab']) && $_GET['tab'] === 'new') echo 'active'; ?>">
+            <a href="<?php echo esc_url(home_url('/operation-dashboard?tab=new')); ?>"
+               class="<?php echo ($tab === 'new') ? 'active' : ''; ?>">
                New Properties
             </a>
 
-            <a href="<?php echo home_url('/operation-dashboard?tab=assigned'); ?>"
-               class="<?php if(isset($_GET['tab']) && $_GET['tab'] === 'assigned') echo 'active'; ?>">
-               Assigned
-            </a>
+            <!-- Assigned & Completed REMOVED -->
 
-            <a href="<?php echo home_url('/operation-dashboard?tab=completed'); ?>"
-               class="<?php if(isset($_GET['tab']) && $_GET['tab'] === 'completed') echo 'active'; ?>">
-               Completed
+            <a href="<?php echo esc_url(home_url('/manage-addons')); ?>"
+               class="<?php echo is_page('manage-addons') ? 'active' : ''; ?>">
+               Manage Add-ons
             </a>
 
         <?php elseif ($role === 'engineer'): ?>
 
-            <a href="<?php echo home_url('/engineer-dashboard'); ?>"
-               class="<?php if(is_page('engineer-dashboard') && !isset($_GET['tab'])) echo 'active'; ?>">
+            <a href="<?php echo esc_url(home_url('/engineer-dashboard')); ?>"
+               class="<?php echo (is_page('engineer-dashboard') && empty($tab)) ? 'active' : ''; ?>">
                Dashboard
             </a>
 
-            <a href="<?php echo home_url('/engineer-dashboard'); ?>">
+            <a href="<?php echo esc_url(home_url('/engineer-dashboard')); ?>">
                Assigned Properties
             </a>
 
-            <a href="<?php echo home_url('/engineer-dashboard?tab=completed'); ?>"
-               class="<?php if(isset($_GET['tab']) && $_GET['tab'] === 'completed') echo 'active'; ?>">
+            <a href="<?php echo esc_url(home_url('/engineer-dashboard?tab=completed')); ?>"
+               class="<?php echo ($tab === 'completed') ? 'active' : ''; ?>">
                Completed Visits
             </a>
 
@@ -133,6 +134,18 @@ $role  = !empty($roles) ? $roles[0] : '';
 
         if (is_page('engineer-dashboard')) {
             include PW_PATH . 'templates/engineer-dashboard.php';
+        }
+
+        if (is_page('assign-package')) {
+            include PW_PATH . 'templates/assign-package.php';
+        }
+
+        if (is_page('update-visit')) {
+            include PW_PATH . 'templates/update-visit.php';
+        }
+
+        if (is_page('manage-addons')) {
+            include PW_PATH . 'templates/manage-addons.php';
         }
         ?>
 

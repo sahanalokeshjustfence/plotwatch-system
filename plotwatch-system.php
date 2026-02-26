@@ -2,7 +2,7 @@
 /*
 Plugin Name: PlotWatch System
 Description: Professional Property & Customer Management System
-Version: 2.0
+Version: 2.2
 Author: PlotWatch
 */
 
@@ -16,7 +16,21 @@ if (!defined('ABSPATH')) exit;
 
 define('PW_PATH', plugin_dir_path(__FILE__));
 define('PW_URL', plugin_dir_url(__FILE__));
-define('PW_VERSION', '2.0');
+define('PW_VERSION', '2.2');
+define('PW_DB_VERSION', '1.2');
+
+/*
+|--------------------------------------------------------------------------
+| STATUS CONSTANTS (Single Column Control)
+|--------------------------------------------------------------------------
+*/
+
+define('PW_STATUS_PENDING', 'Pending Package Assignment');
+define('PW_STATUS_PACKAGE_ASSIGNED', 'Package Assigned');
+define('PW_STATUS_VISITS_CREATED', 'Visits Created');
+define('PW_STATUS_VISIT_SCHEDULED', 'Visit Scheduled');
+define('PW_STATUS_VISIT_COMPLETED', 'Visit Completed');
+define('PW_STATUS_SUBSCRIPTION_COMPLETED', 'Subscription Completed');
 
 /*
 |--------------------------------------------------------------------------
@@ -41,13 +55,13 @@ register_activation_hook(__FILE__, 'pw_create_tables');
 function pw_create_tables() {
 
     global $wpdb;
-    $charset_collate = $wpdb->get_charset_collate();
-
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+
+    $charset_collate = $wpdb->get_charset_collate();
 
     /*
     |--------------------------------------------------------------------------
-    | 1️⃣ PROPERTIES TABLE
+    | 1️⃣ PROPERTIES TABLE (MASTER STATUS COLUMN)
     |--------------------------------------------------------------------------
     */
 
@@ -66,7 +80,7 @@ function pw_create_tables() {
         property_type VARCHAR(100) DEFAULT NULL,
         contact_person VARCHAR(255) DEFAULT NULL,
         contact_number VARCHAR(20) DEFAULT NULL,
-        subscription_status VARCHAR(100) DEFAULT 'Pending Package Assignment',
+        subscription_status VARCHAR(100) DEFAULT '" . PW_STATUS_PENDING . "',
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (id),
         KEY user_id (user_id),
@@ -115,7 +129,7 @@ function pw_create_tables() {
         visit_date DATE DEFAULT NULL,
         comment TEXT DEFAULT NULL,
         media_url TEXT DEFAULT NULL,
-        visit_status VARCHAR(100) DEFAULT 'Completed',
+        visit_status VARCHAR(100) DEFAULT '" . PW_STATUS_VISIT_COMPLETED . "',
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (id),
         KEY property_id (property_id),
@@ -123,6 +137,51 @@ function pw_create_tables() {
     ) $charset_collate;";
 
     dbDelta($sql3);
+
+    /*
+    |--------------------------------------------------------------------------
+    | 4️⃣ ADD-ONS TABLE
+    |--------------------------------------------------------------------------
+    */
+
+    $addons = $wpdb->prefix . 'pw_addons';
+
+    $sql4 = "CREATE TABLE $addons (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        name VARCHAR(150) NOT NULL,
+        price DECIMAL(10,2) DEFAULT 0,
+        description TEXT DEFAULT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id)
+    ) $charset_collate;";
+
+    dbDelta($sql4);
+
+    /*
+    |--------------------------------------------------------------------------
+    | 5️⃣ VISIT SCHEDULE TABLE
+    |--------------------------------------------------------------------------
+    */
+
+    $visits = $wpdb->prefix . 'pw_visits';
+
+    $sql5 = "CREATE TABLE $visits (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        property_id BIGINT UNSIGNED NOT NULL,
+        subscription_id BIGINT UNSIGNED DEFAULT NULL,
+        engineer_id BIGINT UNSIGNED DEFAULT NULL,
+        visit_date DATE NOT NULL,
+        visit_status VARCHAR(100) DEFAULT 'Pending',
+        notes TEXT DEFAULT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        KEY property_id (property_id),
+        KEY engineer_id (engineer_id)
+    ) $charset_collate;";
+
+    dbDelta($sql5);
+
+    update_option('pw_db_version', PW_DB_VERSION);
 }
 
 /*
@@ -159,5 +218,27 @@ add_action('wp_enqueue_scripts', function () {
         PW_VERSION,
         true
     );
+});
 
+/*
+|--------------------------------------------------------------------------
+| FORCE PLUGIN LAYOUT FOR DASHBOARD PAGES
+|--------------------------------------------------------------------------
+*/
+
+add_filter('template_include', function ($template) {
+
+    if (is_page(array(
+        'customer-dashboard',
+        'operation-dashboard',
+        'engineer-dashboard',
+        'assign-package',
+        'add-property',
+        'customer-profile',
+        'manage-addons'
+    ))) {
+        return PW_PATH . 'templates/layout.php';
+    }
+
+    return $template;
 });
