@@ -1,0 +1,389 @@
+/* =====================================================
+   GLOBAL RESET
+===================================================== */
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:Inter, sans-serif;
+    background:#f1f5f9;
+    color:#111827;
+}
+
+/* =====================================================
+   DASHBOARD LAYOUT
+===================================================== */
+
+.pw-app{
+    display:flex;
+    min-height:100vh;
+}
+
+/* SIDEBAR */
+
+.pw-sidebar{
+    width:260px;
+    background:#0f172a;
+    color:white;
+    padding:30px 20px;
+    position:fixed;
+    height:100vh;
+}
+
+.pw-logo{
+    text-align:center;
+}
+
+.pw-logo img{
+    width:140px;
+    margin-bottom:40px;
+}
+
+.pw-sidebar nav a{
+    display:block;
+    padding:12px 15px;
+    color:#cbd5e1;
+    text-decoration:none;
+    border-radius:8px;
+    margin-bottom:10px;
+    transition:0.3s;
+    font-size:15px;
+}
+
+.pw-sidebar nav a:hover{
+    background:#1e293b;
+    color:white;
+}
+
+/* MAIN AREA */
+
+.pw-main{
+    margin-left:260px;
+    flex:1;
+    display:flex;
+    flex-direction:column;
+}
+
+/* HEADER */
+
+.pw-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:20px 40px;
+    background:white;
+    box-shadow:0 2px 10px rgba(0,0,0,.05);
+}
+
+.pw-header h3{
+    margin:0;
+    font-weight:500;
+}
+
+.pw-logout{
+    color:#dc2626;
+    text-decoration:none;
+    font-weight:600;
+}
+
+/* CONTENT */
+
+.pw-content{
+    padding:40px;
+}
+
+/* =====================================================
+   TABLE
+===================================================== */
+
+.pw-table{
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:0 8px 20px rgba(0,0,0,.05);
+}
+
+.pw-table th,
+.pw-table td{
+    padding:16px;
+    border-bottom:1px solid #e5e7eb;
+    text-align:left;
+}
+
+.pw-table th{
+    background:#f9fafb;
+    font-weight:600;
+}
+
+.pw-table tr:hover{
+    background:#f8fafc;
+}
+
+/* =====================================================
+   STATUS BADGES
+===================================================== */
+
+.pw-status-badge{
+    padding:6px 12px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:600;
+    display:inline-block;
+}
+
+.pw-status-active{
+    background:#dcfce7;
+    color:#166534;
+}
+
+.pw-status-pending{
+    background:#fee2e2;
+    color:#991b1b;
+}
+
+.pw-status-warning{
+    background:#fef9c3;
+    color:#854d0e;
+}
+
+.pw-status-completed{
+    background:#e0f2fe;
+    color:#075985;
+}
+
+/* =====================================================
+   BUTTONS
+===================================================== */
+
+.pw-btn{
+    padding:12px 20px;
+    background:#dc2626;
+    border:none;
+    color:white;
+    border-radius:8px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.pw-btn:hover{
+    background:#b91c1c;
+}
+
+.pw-small-btn{
+    padding:6px 14px;
+    background:#dc2626;
+    color:white;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:13px;
+}
+
+/* =====================================================
+   FORMS
+===================================================== */
+
+.pw-form{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+}
+
+.pw-form input,
+.pw-form select,
+.pw-form textarea{
+    padding:12px;
+    border:1px solid #e5e7eb;
+    border-radius:8px;
+    width:100%;
+}
+
+.pw-form textarea{
+    resize:vertical;
+    min-height:100px;
+}
+
+.pw-form .full{
+    grid-column:1/-1;
+}
+
+/* =====================================================
+   MODAL SYSTEM (ONLY ONE)
+===================================================== */
+
+.pw-modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.6);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+}
+
+.pw-modal.active{
+    display:flex;
+}
+
+.pw-modal-card{
+    background:white;
+    width:650px;
+    max-width:95%;
+    padding:35px;
+    border-radius:16px;
+    box-shadow:0 25px 60px rgba(0,0,0,.25);
+    animation:fadeIn .25s ease;
+}
+
+@keyframes fadeIn{
+    from{opacity:0; transform:scale(.95);}
+    to{opacity:1; transform:scale(1);}
+}
+
+.pw-modal-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.pw-close{
+    font-size:22px;
+    cursor:pointer;
+}
+
+.pw-modal-card label{
+    display:block;
+    margin-bottom:6px;
+    font-weight:600;
+}
+
+.pw-modal-card input,
+.pw-modal-card textarea{
+    width:100%;
+    padding:12px;
+    margin-bottom:15px;
+    border:1px solid #e5e7eb;
+    border-radius:8px;
+}
+
+.pw-modal-card textarea{
+    min-height:120px;
+}
+
+/* SUCCESS MESSAGE */
+
+.pw-success-box{
+    background:#dcfce7;
+    color:#166534;
+    padding:12px 20px;
+    border-radius:8px;
+    margin-bottom:20px;
+}
+
+/* =====================================================
+   AUTH PAGE (LOGIN / REGISTER)
+===================================================== */
+
+.pw-auth-wrapper{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:#f1f5f9;
+}
+
+.pw-auth-card{
+    width:420px;
+    background:#16376b;
+    padding:45px 40px;
+    border-radius:18px;
+    box-shadow:0 25px 60px rgba(0,0,0,.15);
+    text-align:center;
+}
+
+.pw-auth-logo{
+    width:110px;
+    margin-bottom:20px;
+}
+
+.pw-auth-card h2{
+    color:#ffffff;
+    margin-bottom:30px;
+}
+
+/* INPUT GROUP */
+
+.pw-input-group{
+    position:relative;
+    margin-bottom:20px;
+}
+
+.pw-auth-card input{
+    width:100%;
+    padding:14px;
+    border-radius:10px;
+    border:none;
+    background:#f1f5f9;
+    font-size:14px;
+    color:#111827;
+}
+
+/* EYE ICON */
+
+.pw-input-group .pw-eye{
+    position:absolute;
+    right:15px;
+    top:50%;
+    transform:translateY(-50%);
+    cursor:pointer;
+    font-size:16px;
+    color:#555;
+}
+
+/* FORGOT PASSWORD */
+
+.pw-forgot{
+    text-align:right;
+    margin-bottom:25px;
+}
+
+.pw-forgot a{
+    font-size:12px;
+    color:#e2e8f0;
+    text-decoration:none;
+}
+
+/* LOGIN BUTTON */
+
+.pw-auth-btn{
+    width:100%;
+    padding:14px;
+    background:#dc2626;
+    border:none;
+    color:white;
+    border-radius:10px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.pw-auth-btn:hover{
+    background:#b91c1c;
+}
+
+.pw-switch{
+    margin-top:22px;
+    font-size:14px;
+    color:#e2e8f0;
+}
+
+.pw-switch a{
+    color:#ff4d4d;
+    text-decoration:none;
+}
