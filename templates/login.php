@@ -1,7 +1,35 @@
 <?php
+if (!defined('ABSPATH')) exit;
+
+/*
+|--------------------------------------------------------------------------
+| IF ALREADY LOGGED IN → ROLE BASED REDIRECT
+|--------------------------------------------------------------------------
+*/
+
 if ( is_user_logged_in() ) {
-    wp_redirect( home_url('/dashboard') ); 
-    exit;
+
+    $current_user = wp_get_current_user();
+
+    if (in_array('customer', (array)$current_user->roles)) {
+        wp_safe_redirect(home_url('/customer-dashboard'));
+        exit;
+    }
+
+    if (in_array('operation_member', (array)$current_user->roles)) {
+        wp_safe_redirect(home_url('/operation-dashboard'));
+        exit;
+    }
+
+    if (in_array('engineer', (array)$current_user->roles)) {
+        wp_safe_redirect(home_url('/engineer-dashboard'));
+        exit;
+    }
+
+    if (in_array('administrator', (array)$current_user->roles)) {
+        wp_safe_redirect(admin_url());
+        exit;
+    }
 }
 ?>
 
@@ -9,7 +37,9 @@ if ( is_user_logged_in() ) {
 
     <div class="pw-auth-card">
 
-        <img src="<?php echo PW_URL; ?>assets/images/logo.png" class="pw-auth-logo" alt="Logo">
+        <img src="<?php echo esc_url(PW_URL . 'assets/images/logo.png'); ?>" 
+             class="pw-auth-logo" 
+             alt="Logo">
 
         <h2>Welcome Back</h2>
 
@@ -35,17 +65,14 @@ if ( is_user_logged_in() ) {
                 <span class="pw-eye" onclick="toggleLoginPass()">👁</span>
             </div>
 
-            
-
             <div class="pw-forgot">
                 <a href="<?php echo esc_url( wp_lostpassword_url() ); ?>">
                     Forgot Password?
                 </a>
             </div>
 
-            <input type="hidden" 
-                   name="redirect_to" 
-                   value="<?php echo home_url('/dashboard'); ?>">
+            <!-- Let login_redirect filter handle redirection -->
+            <!-- No forced redirect_to here -->
 
             <button type="submit" class="pw-auth-btn">
                 Login
@@ -55,7 +82,7 @@ if ( is_user_logged_in() ) {
 
         <p class="pw-switch">
             No account?
-            <a href="<?php echo home_url('/register'); ?>">
+            <a href="<?php echo esc_url(home_url('/register')); ?>">
                 Register
             </a>
         </p>

@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) exit;
 define('PW_PATH', plugin_dir_path(__FILE__));
 define('PW_URL', plugin_dir_url(__FILE__));
 define('PW_VERSION', '2.2');
-define('PW_DB_VERSION', '1.3');
+define('PW_DB_VERSION', '1.4'); // version increased for DB update
 
 /*
 |--------------------------------------------------------------------------
@@ -70,9 +70,7 @@ function pw_create_tables() {
 
     $charset_collate = $wpdb->get_charset_collate();
 
-    /* ==========================
-       PROPERTIES TABLE
-    ========================== */
+    /* ================= PROPERTIES ================= */
 
     $properties = $wpdb->prefix . 'pw_properties';
 
@@ -96,9 +94,7 @@ function pw_create_tables() {
 
     dbDelta($sql1);
 
-    /* ==========================
-       SUBSCRIPTIONS TABLE
-    ========================== */
+    /* ================= SUBSCRIPTIONS ================= */
 
     $subscriptions = $wpdb->prefix . 'pw_subscriptions';
 
@@ -108,7 +104,7 @@ function pw_create_tables() {
         package_type VARCHAR(100) DEFAULT NULL,
         start_date DATE DEFAULT NULL,
         end_date DATE DEFAULT NULL,
-        cost DECIMAL(10,2) DEFAULT 0,
+        package_price DECIMAL(10,2);
         addons TEXT DEFAULT NULL,
         status VARCHAR(100) DEFAULT 'Active',
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -117,9 +113,7 @@ function pw_create_tables() {
 
     dbDelta($sql2);
 
-    /* ==========================
-       PROPERTY LOGS TABLE
-    ========================== */
+    /* ================= PROPERTY LOGS ================= */
 
     $logs = $wpdb->prefix . 'pw_property_logs';
 
@@ -137,16 +131,13 @@ function pw_create_tables() {
 
     dbDelta($sql3);
 
-    /* ==========================
-       ADDONS TABLE
-    ========================== */
+    /* ================= ADDONS (PRICE REMOVED HERE) ================= */
 
     $addons = $wpdb->prefix . 'pw_addons';
 
     $sql4 = "CREATE TABLE $addons (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         name VARCHAR(150) NOT NULL,
-        price DECIMAL(10,2) DEFAULT 0,
         description TEXT DEFAULT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (id)
@@ -154,9 +145,7 @@ function pw_create_tables() {
 
     dbDelta($sql4);
 
-    /* ==========================
-       VISITS TABLE
-    ========================== */
+    /* ================= VISITS ================= */
 
     $visits = $wpdb->prefix . 'pw_visits';
 
@@ -174,9 +163,7 @@ function pw_create_tables() {
 
     dbDelta($sql5);
 
-    /* ==========================
-       PROFILE TABLE
-    ========================== */
+    /* ================= PROFILE ================= */
 
     $profile = $wpdb->prefix . 'pw_profile';
 
@@ -275,3 +262,38 @@ add_filter('template_include', function ($template) {
     return $template;
 
 }, 99);
+
+/*
+|--------------------------------------------------------------------------
+| ROLE BASED LOGIN REDIRECT
+|--------------------------------------------------------------------------
+*/
+
+add_filter('login_redirect', 'pw_role_based_redirect', 10, 3);
+
+function pw_role_based_redirect($redirect_to, $request, $user) {
+
+    if (!isset($user->roles) || !is_array($user->roles)) {
+        return home_url();
+    }
+
+    $roles = (array) $user->roles;
+
+    if (in_array('customer', $roles)) {
+        return home_url('/customer-dashboard');
+    }
+
+    if (in_array('operation_member', $roles)) {
+        return home_url('/operation-dashboard');
+    }
+
+    if (in_array('engineer', $roles)) {
+        return home_url('/engineer-dashboard');
+    }
+
+    if (in_array('administrator', $roles)) {
+        return admin_url();
+    }
+
+    return home_url();
+}

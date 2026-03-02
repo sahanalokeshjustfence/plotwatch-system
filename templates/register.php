@@ -3,12 +3,32 @@ if (!defined('ABSPATH')) exit;
 
 /*
 |--------------------------------------------------------------------------
-| REDIRECT IF ALREADY LOGGED IN
+| REDIRECT IF ALREADY LOGGED IN (ROLE BASED)
 |--------------------------------------------------------------------------
 */
 if (is_user_logged_in()) {
-    wp_safe_redirect(home_url('/customer-dashboard'));
-    exit;
+
+    $current_user = wp_get_current_user();
+
+    if (in_array('customer', $current_user->roles)) {
+        wp_safe_redirect(home_url('/customer-dashboard'));
+        exit;
+    }
+
+    if (in_array('operation_member', $current_user->roles)) {
+        wp_safe_redirect(home_url('/operation-dashboard'));
+        exit;
+    }
+
+    if (in_array('engineer', $current_user->roles)) {
+        wp_safe_redirect(home_url('/engineer-dashboard'));
+        exit;
+    }
+
+    if (in_array('administrator', $current_user->roles)) {
+        wp_safe_redirect(admin_url());
+        exit;
+    }
 }
 
 global $wpdb;
@@ -73,6 +93,12 @@ if (isset($_POST['pw_register'])) {
 
         } else {
 
+            /*
+            |--------------------------------------------------------------------------
+            | INSERT INTO PROFILE TABLE
+            |--------------------------------------------------------------------------
+            */
+
             $wpdb->insert(
                 $profile_table,
                 [
@@ -84,10 +110,35 @@ if (isset($_POST['pw_register'])) {
                 ['%d','%s','%s','%s']
             );
 
-            wp_set_current_user($user_id);
-            wp_set_auth_cookie($user_id);
+            /*
+            |--------------------------------------------------------------------------
+            | EMAIL VERIFICATION (Compatible with class-auth system)
+            |--------------------------------------------------------------------------
+            */
 
-            wp_safe_redirect(home_url('/customer-dashboard'));
+            update_user_meta($user_id, 'pw_verified', 0);
+
+            $token = wp_generate_password(32, false);
+            update_user_meta($user_id, 'pw_verify_token', $token);
+
+            $verify_link = home_url('/?pw_verify=1&uid=' . $user_id . '&token=' . $token);
+
+            $subject = "Verify Your Account - PlotWatch";
+
+            $message = "
+Hello $name,
+
+Please verify your account:
+
+$verify_link
+
+Regards,
+PlotWatch Team
+";
+
+            wp_mail($email, $subject, $message);
+
+            wp_safe_redirect(home_url('/login?registered=1'));
             exit;
         }
     }
@@ -98,7 +149,6 @@ if (isset($_POST['pw_register'])) {
 
     <div class="pw-auth-card">
 
-        <!-- LOGO -->
         <img src="<?php echo esc_url(PW_URL . 'assets/images/logo.png'); ?>" 
              class="pw-auth-logo" 
              alt="Logo">
@@ -134,7 +184,6 @@ if (isset($_POST['pw_register'])) {
                    maxlength="10"
                    required>
 
-            <!-- PASSWORD FIELD -->
             <div class="pw-input-group">
                 <input type="password"
                        name="password"
@@ -144,7 +193,6 @@ if (isset($_POST['pw_register'])) {
                 <span class="pw-eye" onclick="toggleRegPass()">👁</span>
             </div>
 
-            <!-- CONFIRM PASSWORD -->
             <div class="pw-input-group">
                 <input type="password"
                        name="confirm_password"

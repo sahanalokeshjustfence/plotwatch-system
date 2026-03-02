@@ -44,9 +44,10 @@ if (isset($_POST['pw_update_visit'])) {
         wp_die('Security Failed');
     }
 
-    $report = sanitize_textarea_field($_POST['report']);
-    $media_url = '';
+    $notes = sanitize_textarea_field($_POST['report']);
+    $image_url = '';
 
+    /* Handle Image Upload */
     if (!empty($_FILES['visit_image']['name'])) {
 
         require_once(ABSPATH . 'wp-admin/includes/file.php');
@@ -54,17 +55,20 @@ if (isset($_POST['pw_update_visit'])) {
         $uploaded = wp_handle_upload($_FILES['visit_image'], ['test_form'=>false]);
 
         if (!isset($uploaded['error'])) {
-            $media_url = esc_url_raw($uploaded['url']);
+            $image_url = esc_url_raw($uploaded['url']);
         }
+    }
+
+    /* If image uploaded, append to notes */
+    if (!empty($image_url)) {
+        $notes .= "\n\nImage: " . $image_url;
     }
 
     $wpdb->update(
         $wpdb->prefix . 'pw_visits',
         [
-            'status' => 'Completed',
-            'report' => $report,
-            'image'  => $media_url,
-            'completed_at' => current_time('mysql')
+            'visit_status' => 'Completed',
+            'notes'        => $notes
         ],
         ['id' => $visit_id]
     );
@@ -72,9 +76,8 @@ if (isset($_POST['pw_update_visit'])) {
     echo "<div class='pw-success-box'>Visit Updated Successfully</div>";
 
     // Refresh visit data
-    $visit->status = 'Completed';
-    $visit->report = $report;
-    $visit->image  = $media_url;
+    $visit->visit_status = 'Completed';
+    $visit->notes = $notes;
 }
 ?>
 
@@ -106,12 +109,12 @@ if (isset($_POST['pw_update_visit'])) {
 
 <div>
 <label>Status</label>
-<input type="text" value="<?php echo esc_attr($visit->status); ?>" readonly>
+<input type="text" value="<?php echo esc_attr($visit->visit_status); ?>" readonly>
 </div>
 
 </div>
 
-<?php if ($visit->status !== 'Completed'): ?>
+<?php if ($visit->visit_status !== 'Completed'): ?>
 
 <hr>
 
@@ -136,12 +139,7 @@ if (isset($_POST['pw_update_visit'])) {
 <hr>
 
 <h3>Visit Report</h3>
-<p><?php echo esc_html($visit->report); ?></p>
-
-<?php if (!empty($visit->image)): ?>
-<img src="<?php echo esc_url($visit->image); ?>" 
-style="max-width:300px;border-radius:8px;margin-top:10px;">
-<?php endif; ?>
+<p><?php echo nl2br(esc_html($visit->notes)); ?></p>
 
 <?php endif; ?>
 

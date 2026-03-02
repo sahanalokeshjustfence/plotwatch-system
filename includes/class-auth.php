@@ -28,9 +28,13 @@ class PW_Auth {
             wp_die('Security failed');
         }
 
-        $name  = sanitize_text_field($_POST['name']);
-        $email = sanitize_email($_POST['email']);
-        $pass  = $_POST['password'];
+        global $wpdb;
+        $profile_table = $wpdb->prefix . 'pw_profile';
+
+        $name   = sanitize_text_field($_POST['name']);
+        $email  = sanitize_email($_POST['email']);
+        $pass   = $_POST['password'];
+        $mobile = sanitize_text_field($_POST['mobile']); // ✅ ADDED
 
         if (!is_email($email)) {
             wp_safe_redirect(home_url('/register?error=invalid'));
@@ -39,6 +43,12 @@ class PW_Auth {
 
         if (email_exists($email)) {
             wp_safe_redirect(home_url('/register?error=email'));
+            exit;
+        }
+
+        // ✅ Mobile validation
+        if (!preg_match('/^[0-9]{10}$/', $mobile)) {
+            wp_safe_redirect(home_url('/register?error=mobile'));
             exit;
         }
 
@@ -58,7 +68,29 @@ class PW_Auth {
 
         if (!is_wp_error($user_id)) {
 
-            // Only customers require verification
+            /*
+            |--------------------------------------------------------------------------
+            | INSERT MOBILE INTO pw_profile TABLE  ✅ ADDED
+            |--------------------------------------------------------------------------
+            */
+
+            $wpdb->insert(
+                $profile_table,
+                [
+                    'user_id'    => $user_id,
+                    'mobile'     => $mobile,
+                    'created_at' => current_time('mysql'),
+                    'updated_at' => current_time('mysql')
+                ],
+                ['%d','%s','%s','%s']
+            );
+
+            /*
+            |--------------------------------------------------------------------------
+            | EMAIL VERIFICATION
+            |--------------------------------------------------------------------------
+            */
+
             update_user_meta($user_id, 'pw_verified', 0);
 
             $token = wp_generate_password(32, false);
@@ -120,7 +152,6 @@ PlotWatch Team
     public function block_unverified($user, $username, $password) {
 
         if (is_wp_error($user)) return $user;
-
         if (!$user) return $user;
 
         /*
@@ -154,8 +185,6 @@ PlotWatch Team
         /*
         |--------------------------------------------------------------------------
         | OPERATION MEMBER & ENGINEER
-        | No verification required
-        | But must exist in WP admin
         |--------------------------------------------------------------------------
         */
 
