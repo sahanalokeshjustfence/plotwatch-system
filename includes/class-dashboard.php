@@ -9,39 +9,37 @@ class PW_Dashboard {
 
     public function load_templates($template) {
 
-        /*
-        |-----------------------------------------
-        | AUTH PAGES
-        |-----------------------------------------
-        */
+        // AUTH PAGES (Login / Register)
         if (is_page(['login','register'])) {
             return PW_PATH . 'templates/auth-layout.php';
         }
 
-        /*
-        |-----------------------------------------
-        | CUSTOMER PAGES
-        |-----------------------------------------
-        */
-        if (is_page(['customer-dashboard','add-property','customer-profile'])) {
+        // CUSTOMER PAGES
+        if (
+            is_page('customer-dashboard') ||
+            is_page('add-property') ||
+            is_page('customer-profile') ||
+            is_page('my-properties')
+        ) {
             return PW_PATH . 'templates/layout.php';
         }
 
-        /*
-        |-----------------------------------------
-        | OPERATION DASHBOARD
-        |-----------------------------------------
-        */
+        // OPERATION DASHBOARD
         if (is_page('operation-dashboard')) {
             return PW_PATH . 'templates/layout.php';
         }
 
-        /*
-        |-----------------------------------------
-        | ENGINEER DASHBOARD
-        |-----------------------------------------
-        */
+        // ENGINEER DASHBOARD
         if (is_page('engineer-dashboard')) {
+            return PW_PATH . 'templates/layout.php';
+        }
+
+        // OTHER CUSTOM PAGES
+        if (
+            is_page('assign-package') ||
+            is_page('manage-addons') ||
+            is_page('update-visit')
+        ) {
             return PW_PATH . 'templates/layout.php';
         }
 

@@ -17,11 +17,11 @@ if (!defined('ABSPATH')) exit;
 define('PW_PATH', plugin_dir_path(__FILE__));
 define('PW_URL', plugin_dir_url(__FILE__));
 define('PW_VERSION', '2.2');
-define('PW_DB_VERSION', '1.2');
+define('PW_DB_VERSION', '1.3');
 
 /*
 |--------------------------------------------------------------------------
-| STATUS CONSTANTS (Single Column Control)
+| STATUS CONSTANTS
 |--------------------------------------------------------------------------
 */
 
@@ -46,11 +46,22 @@ add_action('after_setup_theme', function () {
 
 /*
 |--------------------------------------------------------------------------
-| CREATE ALL REQUIRED TABLES ON ACTIVATION
+| ACTIVATE PLUGIN
 |--------------------------------------------------------------------------
 */
 
-register_activation_hook(__FILE__, 'pw_create_tables');
+register_activation_hook(__FILE__, 'pw_activate_plugin');
+
+function pw_activate_plugin() {
+    pw_create_tables();
+    flush_rewrite_rules();
+}
+
+/*
+|--------------------------------------------------------------------------
+| CREATE / UPDATE DATABASE TABLES
+|--------------------------------------------------------------------------
+*/
 
 function pw_create_tables() {
 
@@ -59,11 +70,9 @@ function pw_create_tables() {
 
     $charset_collate = $wpdb->get_charset_collate();
 
-    /*
-    |--------------------------------------------------------------------------
-    | 1️⃣ PROPERTIES TABLE (MASTER STATUS COLUMN)
-    |--------------------------------------------------------------------------
-    */
+    /* ==========================
+       PROPERTIES TABLE
+    ========================== */
 
     $properties = $wpdb->prefix . 'pw_properties';
 
@@ -82,19 +91,14 @@ function pw_create_tables() {
         contact_number VARCHAR(20) DEFAULT NULL,
         subscription_status VARCHAR(100) DEFAULT '" . PW_STATUS_PENDING . "',
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY (id),
-        KEY user_id (user_id),
-        KEY assigned_engineer (assigned_engineer),
-        KEY property_code (property_code)
+        PRIMARY KEY (id)
     ) $charset_collate;";
 
     dbDelta($sql1);
 
-    /*
-    |--------------------------------------------------------------------------
-    | 2️⃣ SUBSCRIPTIONS TABLE
-    |--------------------------------------------------------------------------
-    */
+    /* ==========================
+       SUBSCRIPTIONS TABLE
+    ========================== */
 
     $subscriptions = $wpdb->prefix . 'pw_subscriptions';
 
@@ -108,17 +112,14 @@ function pw_create_tables() {
         addons TEXT DEFAULT NULL,
         status VARCHAR(100) DEFAULT 'Active',
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY (id),
-        KEY property_id (property_id)
+        PRIMARY KEY (id)
     ) $charset_collate;";
 
     dbDelta($sql2);
 
-    /*
-    |--------------------------------------------------------------------------
-    | 3️⃣ ENGINEER VISIT LOGS TABLE
-    |--------------------------------------------------------------------------
-    */
+    /* ==========================
+       PROPERTY LOGS TABLE
+    ========================== */
 
     $logs = $wpdb->prefix . 'pw_property_logs';
 
@@ -131,18 +132,14 @@ function pw_create_tables() {
         media_url TEXT DEFAULT NULL,
         visit_status VARCHAR(100) DEFAULT '" . PW_STATUS_VISIT_COMPLETED . "',
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY (id),
-        KEY property_id (property_id),
-        KEY engineer_id (engineer_id)
+        PRIMARY KEY (id)
     ) $charset_collate;";
 
     dbDelta($sql3);
 
-    /*
-    |--------------------------------------------------------------------------
-    | 4️⃣ ADD-ONS TABLE
-    |--------------------------------------------------------------------------
-    */
+    /* ==========================
+       ADDONS TABLE
+    ========================== */
 
     $addons = $wpdb->prefix . 'pw_addons';
 
@@ -157,11 +154,9 @@ function pw_create_tables() {
 
     dbDelta($sql4);
 
-    /*
-    |--------------------------------------------------------------------------
-    | 5️⃣ VISIT SCHEDULE TABLE
-    |--------------------------------------------------------------------------
-    */
+    /* ==========================
+       VISITS TABLE
+    ========================== */
 
     $visits = $wpdb->prefix . 'pw_visits';
 
@@ -174,19 +169,52 @@ function pw_create_tables() {
         visit_status VARCHAR(100) DEFAULT 'Pending',
         notes TEXT DEFAULT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY (id),
-        KEY property_id (property_id),
-        KEY engineer_id (engineer_id)
+        PRIMARY KEY (id)
     ) $charset_collate;";
 
     dbDelta($sql5);
+
+    /* ==========================
+       PROFILE TABLE
+    ========================== */
+
+    $profile = $wpdb->prefix . 'pw_profile';
+
+    $sql6 = "CREATE TABLE $profile (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        user_id BIGINT UNSIGNED NOT NULL,
+        mobile VARCHAR(20) DEFAULT NULL,
+        dob DATE DEFAULT NULL,
+        address TEXT DEFAULT NULL,
+        aadhaar VARCHAR(20) DEFAULT NULL,
+        pan VARCHAR(20) DEFAULT NULL,
+        photo VARCHAR(255) DEFAULT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        UNIQUE KEY user_id (user_id)
+    ) $charset_collate;";
+
+    dbDelta($sql6);
 
     update_option('pw_db_version', PW_DB_VERSION);
 }
 
 /*
 |--------------------------------------------------------------------------
-| LOAD REQUIRED FILES
+| AUTO UPDATE DB IF VERSION CHANGES
+|--------------------------------------------------------------------------
+*/
+
+add_action('plugins_loaded', function () {
+    if (get_option('pw_db_version') !== PW_DB_VERSION) {
+        pw_create_tables();
+    }
+});
+
+/*
+|--------------------------------------------------------------------------
+| LOAD CORE CLASSES
 |--------------------------------------------------------------------------
 */
 
@@ -222,13 +250,17 @@ add_action('wp_enqueue_scripts', function () {
 
 /*
 |--------------------------------------------------------------------------
-| FORCE PLUGIN LAYOUT FOR DASHBOARD PAGES
+| TEMPLATE LOADER
 |--------------------------------------------------------------------------
 */
 
 add_filter('template_include', function ($template) {
 
-    if (is_page(array(
+    if (is_page(['login', 'register'])) {
+        return PW_PATH . 'templates/auth-layout.php';
+    }
+
+    if (is_page([
         'customer-dashboard',
         'operation-dashboard',
         'engineer-dashboard',
@@ -236,9 +268,10 @@ add_filter('template_include', function ($template) {
         'add-property',
         'customer-profile',
         'manage-addons'
-    ))) {
+    ])) {
         return PW_PATH . 'templates/layout.php';
     }
 
     return $template;
-});
+
+}, 99);

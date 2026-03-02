@@ -2,35 +2,149 @@
 if (!is_user_logged_in()) return;
 
 global $wpdb;
-
 $user_id = get_current_user_id();
+$table = $wpdb->prefix . 'pw_properties';
 
-/*
-|--------------------------------------------------------------------------
-| FETCH ACTIVE PROPERTIES
-|--------------------------------------------------------------------------
-*/
+/* =====================================================
+   UPDATE PROPERTY
+===================================================== */
+
+if (isset($_POST['pw_update_property'])) {
+
+    $wpdb->update(
+        $table,
+        [
+            'property_name'   => sanitize_text_field($_POST['property_name']),
+            'location_name'   => sanitize_text_field($_POST['location_name']),
+            'plot_size'       => sanitize_text_field($_POST['plot_size']),
+            'property_type'   => sanitize_text_field($_POST['property_type']),
+            'contact_person'  => sanitize_text_field($_POST['contact_person']),
+            'contact_number'  => sanitize_text_field($_POST['contact_number']),
+            'address'         => sanitize_textarea_field($_POST['address']),
+            'google_map'      => sanitize_text_field($_POST['google_map']),
+        ],
+        ['id' => intval($_POST['property_id'])]
+    );
+
+    echo "<script>location.reload();</script>";
+}
+
+
+/* =====================================================
+   VIEW SINGLE PROPERTY
+===================================================== */
+
+if (isset($_GET['view'])):
+
+$property_id = intval($_GET['view']);
+
+$prop = $wpdb->get_row(
+    $wpdb->prepare(
+        "SELECT * FROM $table WHERE id = %d AND user_id = %d",
+        $property_id,
+        $user_id
+    )
+);
+
+if ($prop):
+?>
+
+<div class="pw-property-detail-card">
+
+<h2>Property Details</h2>
+
+<form method="post">
+
+<input type="hidden" name="property_id" value="<?php echo $prop->id; ?>">
+
+<div class="pw-grid-3">
+
+    <div>
+        <label>Property ID</label>
+        <input type="text" value="<?php echo esc_attr($prop->property_code ?: $prop->id); ?>" disabled>
+    </div>
+
+    <div>
+        <label>Property Name</label>
+        <input type="text" name="property_name" value="<?php echo esc_attr($prop->property_name); ?>">
+    </div>
+
+    <div>
+        <label>Location Name</label>
+        <input type="text" name="location_name" value="<?php echo esc_attr($prop->location_name); ?>">
+    </div>
+
+    <div>
+        <label>Plot Size</label>
+        <input type="text" name="plot_size" value="<?php echo esc_attr($prop->plot_size); ?>">
+    </div>
+
+    <div>
+        <label>Property Type</label>
+        <input type="text" name="property_type" value="<?php echo esc_attr($prop->property_type); ?>">
+    </div>
+
+    <div>
+        <label>Contact Person</label>
+        <input type="text" name="contact_person" value="<?php echo esc_attr($prop->contact_person); ?>">
+    </div>
+
+    <div>
+        <label>Contact Number</label>
+        <input type="text" name="contact_number" value="<?php echo esc_attr($prop->contact_number); ?>">
+    </div>
+
+    <div class="full">
+        <label>Full Address</label>
+        <textarea name="address"><?php echo esc_textarea($prop->address); ?></textarea>
+    </div>
+
+    <div class="full">
+        <label>Google Map</label>
+        <input type="text" name="google_map" value="<?php echo esc_attr($prop->google_map); ?>">
+    </div>
+
+</div>
+
+<button type="submit" name="pw_update_property" class="pw-btn">
+    Update Property
+</button>
+
+<a href="<?php echo home_url('/customer-dashboard?tab=my-properties'); ?>" 
+   class="pw-small-btn" 
+   style="margin-left:10px;">
+   Back
+</a>
+
+</form>
+
+</div>
+
+<?php
+endif;
+return;
+endif;
+
+
+/* =====================================================
+   FETCH PROPERTIES (CARD VIEW)
+===================================================== */
 
 $properties = $wpdb->get_results(
     $wpdb->prepare(
-        "SELECT * FROM {$wpdb->prefix}pw_properties 
-         WHERE user_id = %d 
-         AND subscription_status IN 
-         ('Active Subscription','Visit Scheduled','Completed')
-         ORDER BY id DESC",
+        "SELECT * FROM $table WHERE user_id = %d ORDER BY id DESC",
         $user_id
     )
 );
 ?>
 
-<h2>My Properties</h2>
+<h2 class="pw-page-title">My Properties</h2>
 
 <?php if (!empty($properties)) : ?>
 
-<?php foreach ($properties as $prop) : ?>
+<div class="pw-property-card-grid">
 
-<?php
-/* ================= STATUS BADGE ================= */
+<?php foreach ($properties as $prop) :
 
 $status_class = 'pw-status-pending';
 
@@ -43,181 +157,32 @@ elseif ($prop->subscription_status === 'Visit Scheduled') {
 elseif ($prop->subscription_status === 'Completed') {
     $status_class = 'pw-status-completed';
 }
-
-/* ================= LATEST SUBSCRIPTION ================= */
-
-$subscription = $wpdb->get_row(
-    $wpdb->prepare(
-        "SELECT * FROM {$wpdb->prefix}pw_subscriptions 
-         WHERE property_id = %d 
-         ORDER BY id DESC LIMIT 1",
-        $prop->id
-    )
-);
-
-/* ================= UPCOMING VISIT ================= */
-
-$upcoming_visit = $wpdb->get_row(
-    $wpdb->prepare(
-        "SELECT v.*, u.display_name AS engineer_name
-         FROM {$wpdb->prefix}pw_visits v
-         LEFT JOIN {$wpdb->users} u ON v.engineer_id = u.ID
-         WHERE v.property_id = %d
-         ORDER BY v.visit_date ASC LIMIT 1",
-        $prop->id
-    )
-);
-
-/* ================= VISIT HISTORY ================= */
-
-$visit_history = $wpdb->get_results(
-    $wpdb->prepare(
-        "SELECT v.*, u.display_name AS engineer_name
-         FROM {$wpdb->prefix}pw_visits v
-         LEFT JOIN {$wpdb->users} u ON v.engineer_id = u.ID
-         WHERE v.property_id = %d
-         ORDER BY v.visit_date DESC LIMIT 5",
-        $prop->id
-    )
-);
 ?>
 
-<div class="pw-rectangle" style="margin-bottom:30px;">
+<a href="<?php echo home_url('/customer-dashboard?tab=my-properties&view=' . $prop->id); ?>" 
+   class="pw-property-summary-card">
+
+    <div class="pw-card-top">
+        <span class="pw-property-id">
+            ID: <?php echo esc_html($prop->property_code ?: $prop->id); ?>
+        </span>
+
+        <span class="pw-status-badge <?php echo esc_attr($status_class); ?>">
+            <?php echo esc_html($prop->subscription_status); ?>
+        </span>
+    </div>
 
     <h3><?php echo esc_html($prop->property_name); ?></h3>
 
-    <div class="pw-grid-3">
+    <p class="pw-location">
+        <?php echo esc_html($prop->location_name); ?>
+    </p>
 
-        <div>
-            <strong>Property ID</strong>
-            <p><?php echo esc_html($prop->property_code); ?></p>
-        </div>
-
-        <div>
-            <strong>Location</strong>
-            <p><?php echo esc_html($prop->location_name); ?></p>
-        </div>
-
-        <div>
-            <strong>Status</strong>
-            <p>
-                <span class="pw-status-badge <?php echo esc_attr($status_class); ?>">
-                    <?php echo esc_html($prop->subscription_status); ?>
-                </span>
-            </p>
-        </div>
-
-    </div>
-
-    <?php if ($subscription) : ?>
-
-    <hr>
-
-    <h4>Subscription Details</h4>
-
-    <div class="pw-grid-3">
-
-        <div>
-            <strong>Package</strong>
-            <p><?php echo esc_html($subscription->package_type); ?></p>
-        </div>
-
-        <div>
-            <strong>Start Date</strong>
-            <p><?php echo esc_html(date('d-m-Y', strtotime($subscription->start_date))); ?></p>
-        </div>
-
-        <div>
-            <strong>End Date</strong>
-            <p><?php echo esc_html(date('d-m-Y', strtotime($subscription->end_date))); ?></p>
-        </div>
-
-    </div>
-
-    <?php endif; ?>
-
-
-    <?php if ($upcoming_visit) : ?>
-
-    <hr>
-
-    <h4>Next Visit</h4>
-
-    <div class="pw-grid-3">
-
-        <div>
-            <strong>Visit Date</strong>
-            <p><?php echo esc_html(date('d-m-Y', strtotime($upcoming_visit->visit_date))); ?></p>
-        </div>
-
-        <div>
-            <strong>Engineer</strong>
-            <p><?php echo esc_html($upcoming_visit->engineer_name); ?></p>
-        </div>
-
-        <div>
-            <strong>Status</strong>
-            <p><?php echo esc_html($upcoming_visit->status); ?></p>
-        </div>
-
-    </div>
-
-    <?php if (!empty($upcoming_visit->report_file)) : ?>
-        <p>
-            <strong>Report:</strong> 
-            <a href="<?php echo esc_url($upcoming_visit->report_file); ?>" target="_blank">
-                View Report
-            </a>
-        </p>
-    <?php endif; ?>
-
-    <?php endif; ?>
-
-
-    <?php if (!empty($visit_history)) : ?>
-
-    <hr>
-
-    <h4>Recent Visits</h4>
-
-    <table class="pw-table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Engineer</th>
-                <th>Status</th>
-                <th>Report</th>
-            </tr>
-        </thead>
-        <tbody>
-
-        <?php foreach ($visit_history as $visit) : ?>
-
-            <tr>
-                <td><?php echo esc_html(date('d-m-Y', strtotime($visit->visit_date))); ?></td>
-                <td><?php echo esc_html($visit->engineer_name); ?></td>
-                <td><?php echo esc_html($visit->status); ?></td>
-                <td>
-                    <?php if (!empty($visit->report_file)) : ?>
-                        <a href="<?php echo esc_url($visit->report_file); ?>" target="_blank">
-                            View
-                        </a>
-                    <?php else : ?>
-                        -
-                    <?php endif; ?>
-                </td>
-            </tr>
-
-        <?php endforeach; ?>
-
-        </tbody>
-    </table>
-
-    <?php endif; ?>
-
-</div>
+</a>
 
 <?php endforeach; ?>
+
+</div>
 
 <?php else : ?>
 

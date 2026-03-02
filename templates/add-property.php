@@ -2,71 +2,94 @@
 if (!is_user_logged_in()) return; 
 ?>
 
-<h2>Add Property</h2>
+<div class="pw-property-card">
 
-<form method="post" class="pw-form">
+    <h2 class="pw-page-title">Add Property</h2>
 
-    <?php wp_nonce_field('pw_add_property_nonce'); ?>
-    <input type="hidden" name="pw_add_property" value="1">
+    <form method="post" class="pw-property-form">
 
-    <!-- Property Name -->
-    <input type="text" 
-           name="property_name" 
-           placeholder="Property Name" 
-           class="full" 
-           required>
+        <?php wp_nonce_field('pw_add_property_nonce'); ?>
+        <input type="hidden" name="pw_add_property" value="1">
 
-    <!-- Location Name -->
-    <input type="text" 
-           name="location_name" 
-           placeholder="Location Name" 
-           required>
+        <!-- ROW 1 -->
+        <div class="pw-grid-3">
+            <div>
+                <label>Property Name *</label>
+                <input type="text" 
+                       name="property_name" 
+                       required>
+            </div>
 
-    <!-- Full Address -->
-    <textarea name="address" 
-              placeholder="Full Address" 
-              class="full" 
-              required></textarea>
+            <div>
+                <label>Location Name *</label>
+                <input type="text" 
+                       name="location_name" 
+                       required>
+            </div>
 
-    <!-- Google Map Pin -->
-    <input type="text" 
-           name="google_map" 
-           placeholder="Google Map Pin / Coordinates (Optional)">
+            <div>
+                <label>Plot Size (Ex: 1200 sqft) *</label>
+                <input type="text" 
+                       name="plot_size" 
+                       required>
+            </div>
+        </div>
 
-    <!-- Plot Size -->
-    <input type="text" 
-           name="plot_size" 
-           placeholder="Plot Size (Ex: 1200 sqft)" 
-           required>
+        <!-- ROW 2 -->
+        <div class="pw-grid-3">
+            <div>
+                <label>Property Type *</label>
+                <select name="property_type" required>
+                    <option value="">Select Property Type</option>
+                    <option value="Residential">Residential</option>
+                    <option value="Commercial">Commercial</option>
+                    <option value="Land">Land</option>
+                    <option value="Warehouse">Warehouse</option>
+                </select>
+            </div>
 
-    <!-- Property Type -->
-    <select name="property_type" required>
-        <option value="">Select Property Type</option>
-        <option value="Residential">Residential</option>
-        <option value="Commercial">Commercial</option>
-        <option value="Land">Land</option>
-        <option value="Warehouse">Warehouse</option>
-    </select>
+            <div>
+                <label>Contact Person *</label>
+                <input type="text" 
+                       name="contact_person" 
+                       required>
+            </div>
 
-    <!-- Contact Person -->
-    <input type="text" 
-           name="contact_person" 
-           placeholder="Contact Person" 
-           required>
+            <div>
+                <label>Contact Number *</label>
+                <input type="text" 
+                       name="contact_number" 
+                       required>
+            </div>
+        </div>
 
-    <!-- Contact Number -->
-    <input type="text" 
-           name="contact_number" 
-           placeholder="Contact Number" 
-           required>
+        <!-- ROW 3 -->
+        <div class="pw-grid-3">
+            <div class="full">
+                <label>Full Address *</label>
+                <textarea name="address" required></textarea>
+            </div>
+        </div>
 
-    <!-- Special Instructions -->
-    <textarea name="special_instructions" 
-              placeholder="Special Instructions (Optional)" 
-              class="full"></textarea>
+        <!-- ROW 4 -->
+        <div class="pw-grid-3">
+            <div>
+                <label>Google Map Pin / Coordinates *</label>
+                <input type="text" 
+                       name="google_map" 
+                       required>
+            </div>
 
-    <button type="submit" class="pw-btn full">
-        Submit Property
-    </button>
+            <div class="full">
+                <label>Special Instructions (Optional)</label>
+                <textarea name="special_instructions"></textarea>
+            </div>
+        </div>
 
-</form>
+        <button type="submit" class="pw-btn pw-submit-btn">
+            Submit Property
+        </button>
+
+    </form>
+
+</div>

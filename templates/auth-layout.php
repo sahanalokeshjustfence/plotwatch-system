@@ -1,24 +1,60 @@
 <?php
 if (!defined('ABSPATH')) exit;
 
-// If already logged in → let role redirect handle it
+/*
+|--------------------------------------------------------------------------
+| IF USER LOGGED IN → REDIRECT BASED ON ROLE
+|--------------------------------------------------------------------------
+*/
+
 if (is_user_logged_in()) {
-    wp_safe_redirect(home_url());
+
+    $user = wp_get_current_user();
+
+    if (in_array('customer', (array) $user->roles)) {
+        wp_safe_redirect(home_url('/customer-dashboard'));
+        exit;
+    }
+
+    if (in_array('operation_member', (array) $user->roles)) {
+        wp_safe_redirect(home_url('/operation-dashboard'));
+        exit;
+    }
+
+    if (in_array('engineer', (array) $user->roles)) {
+        wp_safe_redirect(home_url('/engineer-dashboard'));
+        exit;
+    }
+
+    wp_safe_redirect(admin_url());
     exit;
 }
 ?>
 
 <!DOCTYPE html>
-<html>
+<html <?php language_attributes(); ?>>
 <head>
-<meta charset="UTF-8">
-<?php wp_head(); ?>
+    <meta charset="<?php bloginfo('charset'); ?>">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <?php wp_head(); ?>
 </head>
-<body>
+
+<body class="pw-auth-page">
 
 <?php
-if (is_page('login')) include PW_PATH.'templates/login.php';
-if (is_page('register')) include PW_PATH.'templates/register.php';
+/*
+|--------------------------------------------------------------------------
+| LOAD AUTH TEMPLATE
+|--------------------------------------------------------------------------
+*/
+
+if (is_page('login')) {
+    include PW_PATH . 'templates/login.php';
+}
+
+elseif (is_page('register')) {
+    include PW_PATH . 'templates/register.php';
+}
 ?>
 
 <?php wp_footer(); ?>
