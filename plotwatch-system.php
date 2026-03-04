@@ -303,3 +303,14 @@ function pw_role_based_redirect($redirect_to, $request, $user) {
 
     return home_url();
 }
+
+add_action('wp_footer', 'pw_global_footer');
+
+function pw_global_footer() {
+
+    echo '<div class="pw-footer-global">'
+        . date('Y') .
+        ' © Dextra Square Private Limited
+    </div>';
+
+}

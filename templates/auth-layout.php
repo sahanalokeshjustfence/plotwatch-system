@@ -63,6 +63,8 @@ elseif (is_page('register')) {
 }
 ?>
 
+
+
 <?php wp_footer(); ?>
 </body>
 </html>

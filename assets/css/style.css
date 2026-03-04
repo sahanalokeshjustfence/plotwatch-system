@@ -1248,3 +1248,22 @@ input[type="file"] {
     color: #c0392b;
     border: 1px solid #c0392b;
 }
+
+/* GLOBAL FOOTER */
+
+.pw-footer-global{
+    position:fixed;
+    bottom:0;
+    right:0;
+    width:100%;
+    padding:10px 25px;
+    font-size:12px;
+    color:#6b7280;
+    border-top:1px solid #e5e7eb;
+    background:#ffffff;
+    text-align:right;
+    z-index:999;
+}
+body{
+    padding-bottom:40px;
+}
