@@ -32,10 +32,11 @@ define('PW_STATUS_VISITS_CREATED', 'Visits Created');
 
 define('PW_STATUS_VISIT_ASSIGNED', 'Visit Assigned');
 
-define('PW_STATUS_VISIT_IN_PROGRESS', 'Visit In Progress');
+//define('PW_STATUS_VISIT_IN_PROGRESS', 'Visit In Progress');
+
+define('PW_STATUS_VISIT_COMPLETED', 'Visit Completed');
 
 define('PW_STATUS_SUBSCRIPTION_COMPLETED', 'Subscription Completed');
-
 /*
 |--------------------------------------------------------------------------
 | REMOVE ADMIN BAR (NON-ADMIN USERS)
