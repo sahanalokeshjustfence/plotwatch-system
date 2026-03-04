@@ -75,9 +75,11 @@ if (!is_user_logged_in()) return;
         <div class="pw-grid-3">
             <div>
                 <label>Google Map Pin / Coordinates *</label>
-                <input type="text" 
-                       name="google_map" 
-                       required>
+                <input type="url"
+       name="google_map"
+       placeholder="https://maps.google.com/..."
+       pattern="https?://.+"
+       required>
             </div>
 
             <div class="full">

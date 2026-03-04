@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) exit;
 define('PW_PATH', plugin_dir_path(__FILE__));
 define('PW_URL', plugin_dir_url(__FILE__));
 define('PW_VERSION', '2.2');
-define('PW_DB_VERSION', '1.4'); // version increased for DB update
+define('PW_DB_VERSION', '1.5'); // version increased for DB update
 
 /*
 |--------------------------------------------------------------------------
@@ -25,11 +25,15 @@ define('PW_DB_VERSION', '1.4'); // version increased for DB update
 |--------------------------------------------------------------------------
 */
 
+
 define('PW_STATUS_PENDING', 'Pending Package Assignment');
-define('PW_STATUS_PACKAGE_ASSIGNED', 'Package Assigned');
+
 define('PW_STATUS_VISITS_CREATED', 'Visits Created');
-define('PW_STATUS_VISIT_SCHEDULED', 'Visit Scheduled');
-define('PW_STATUS_VISIT_COMPLETED', 'Visit Completed');
+
+define('PW_STATUS_VISIT_ASSIGNED', 'Visit Assigned');
+
+define('PW_STATUS_VISIT_IN_PROGRESS', 'Visit In Progress');
+
 define('PW_STATUS_SUBSCRIPTION_COMPLETED', 'Subscription Completed');
 
 /*
@@ -87,6 +91,7 @@ function pw_create_tables() {
         property_type VARCHAR(100) DEFAULT NULL,
         contact_person VARCHAR(255) DEFAULT NULL,
         contact_number VARCHAR(20) DEFAULT NULL,
+        special_instructions TEXT DEFAULT NULL,
         subscription_status VARCHAR(100) DEFAULT '" . PW_STATUS_PENDING . "',
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (id)
@@ -104,7 +109,7 @@ function pw_create_tables() {
         package_type VARCHAR(100) DEFAULT NULL,
         start_date DATE DEFAULT NULL,
         end_date DATE DEFAULT NULL,
-        package_price DECIMAL(10,2);
+        package_price DECIMAL(10,2) DEFAULT NULL,
         addons TEXT DEFAULT NULL,
         status VARCHAR(100) DEFAULT 'Active',
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,

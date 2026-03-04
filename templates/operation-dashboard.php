@@ -113,13 +113,28 @@ Filter
 <label>Status</label>
 <select name="status">
 <option value="">All Status</option>
-<option value="Pending Package Assignment" <?php selected($status,'Pending Package Assignment'); ?>>Pending</option>
-<option value="Package Assigned" <?php selected($status,'Package Assigned'); ?>>Package Assigned</option>
-<option value="Visit Scheduled" <?php selected($status,'Visit Scheduled'); ?>>Visit Scheduled</option>
-<option value="Visit Completed" <?php selected($status,'Visit Completed'); ?>>Visit Completed</option>
-<option value="Subscription Completed" <?php selected($status,'Subscription Completed'); ?>>Subscription Completed</option>
-</select>
 
+<option value="Pending Package Assignment"
+<?php selected($status,'Pending Package Assignment'); ?>>
+Pending Package Assignment
+</option>
+
+<option value="Visits Created"
+<?php selected($status,'Visits Created'); ?>>
+Visits Created
+</option>
+
+<option value="Visit Assigned"
+<?php selected($status,'Visit Assigned'); ?>>
+Visit Assigned
+</option>
+
+<option value="Subscription Completed"
+<?php selected($status,'Subscription Completed'); ?>>
+Subscription Completed
+</option>
+
+</select>
 <div class="pw-filter-actions">
 <button class="pw-btn">Apply</button>
 <a href="<?php echo esc_url( add_query_arg(['tab'=>$tab]) ); ?>" class="pw-btn-light">Reset</a>
@@ -153,10 +168,21 @@ foreach ($rows as $row):
 $status_class = 'pw-status-pending';
 
 switch ($row->subscription_status) {
-    case 'Package Assigned': $status_class = 'pw-status-active'; break;
-    case 'Visit Scheduled': $status_class = 'pw-status-warning'; break;
-    case 'Visit Completed': $status_class = 'pw-status-active'; break;
-    case 'Subscription Completed': $status_class = 'pw-status-completed'; break;
+
+    case 'Visits Created':
+        $status_class = 'pw-status-warning';
+        break;
+
+    case 'Visit Assigned':
+        $status_class = 'pw-status-active';
+        break;
+
+    case 'Subscription Completed':
+        $status_class = 'pw-status-completed';
+        break;
+
+    default:
+        $status_class = 'pw-status-pending';
 }
 
 $assign_url = esc_url(

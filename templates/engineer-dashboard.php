@@ -50,15 +50,33 @@ $visits = $wpdb->get_results(
 <td><?php echo esc_html($visit->visit_date); ?></td>
 
 <td>
-<span class="pw-status-badge 
-<?php echo $visit->status === 'Completed' ? 'pw-status-completed' : 'pw-status-warning'; ?>">
-<?php echo esc_html($visit->status); ?>
+<?php
+$visit_status_class = 'pw-status-pending';
+
+switch ($visit->visit_status) {
+
+    case 'Scheduled':
+        $visit_status_class = 'pw-status-warning';
+        break;
+
+    case 'Completed':
+        $visit_status_class = 'pw-status-completed';
+        break;
+
+    case 'Pending':
+    default:
+        $visit_status_class = 'pw-status-pending';
+}
+?>
+
+<span class="pw-status-badge <?php echo esc_attr($visit_status_class); ?>">
+    <?php echo esc_html($visit->visit_status); ?>
 </span>
 </td>
 
 <td>
 
-<?php if ($visit->status !== 'Completed'): ?>
+<?php if ($visit->visit_status !== 'Completed'): ?>
 
 <a href="<?php echo esc_url(home_url('/update-visit?visit_id=' . intval($visit->id))); ?>" 
 class="pw-small-btn">

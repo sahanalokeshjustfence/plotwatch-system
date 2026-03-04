@@ -146,16 +146,58 @@ $properties = $wpdb->get_results(
 
 <?php foreach ($properties as $prop) :
 
+/* =====================================================
+   PROPERTY STATUS BADGE
+===================================================== */
+
 $status_class = 'pw-status-pending';
 
-if ($prop->subscription_status === 'Active Subscription') {
-    $status_class = 'pw-status-active';
+switch ($prop->subscription_status) {
+
+    case 'Visits Created':
+        $status_class = 'pw-status-warning';
+        break;
+
+    case 'Visit Assigned':
+        $status_class = 'pw-status-active';
+        break;
+
+    case 'Subscription Completed':
+        $status_class = 'pw-status-completed';
+        break;
+
+    default:
+        $status_class = 'pw-status-pending';
 }
-elseif ($prop->subscription_status === 'Visit Scheduled') {
-    $status_class = 'pw-status-warning';
-}
-elseif ($prop->subscription_status === 'Completed') {
-    $status_class = 'pw-status-completed';
+
+/* =====================================================
+   SUBSCRIPTION ACTIVE / EXPIRED BADGE
+===================================================== */
+
+$subscription = $wpdb->get_row(
+    $wpdb->prepare(
+        "SELECT start_date, end_date 
+         FROM {$wpdb->prefix}pw_subscriptions
+         WHERE property_id = %d
+         ORDER BY id DESC LIMIT 1",
+        $prop->id
+    )
+);
+
+$subscription_badge = '';
+$subscription_class = '';
+
+if ($subscription && $subscription->start_date && $subscription->end_date) {
+
+    $today = date('Y-m-d');
+
+    if ($today >= $subscription->start_date && $today <= $subscription->end_date) {
+        $subscription_badge = 'Active Subscription';
+        $subscription_class = 'pw-sub-active';
+    } elseif ($today > $subscription->end_date) {
+        $subscription_badge = 'Subscription Expired';
+        $subscription_class = 'pw-sub-expired';
+    }
 }
 ?>
 
@@ -163,6 +205,13 @@ elseif ($prop->subscription_status === 'Completed') {
    class="pw-property-summary-card">
 
     <div class="pw-card-top">
+
+        <?php if (!empty($subscription_badge)) : ?>
+            <span class="pw-sub-badge <?php echo esc_attr($subscription_class); ?>">
+                <?php echo esc_html($subscription_badge); ?>
+            </span>
+        <?php endif; ?>
+
         <span class="pw-property-id">
             ID: <?php echo esc_html($prop->property_code ?: $prop->id); ?>
         </span>
@@ -170,6 +219,7 @@ elseif ($prop->subscription_status === 'Completed') {
         <span class="pw-status-badge <?php echo esc_attr($status_class); ?>">
             <?php echo esc_html($prop->subscription_status); ?>
         </span>
+
     </div>
 
     <h3><?php echo esc_html($prop->property_name); ?></h3>

@@ -34,9 +34,19 @@ if (!$property) {
     return;
 }
 
-/* ================= CHECK PACKAGE STATUS ================= */
 
-$package_assigned = !empty($property->package_type) && !empty($property->package_start);
+/* ================= LOAD LATEST SUBSCRIPTION ================= */
+
+$subscription = $wpdb->get_row(
+    $wpdb->prepare(
+        "SELECT * FROM {$wpdb->prefix}pw_subscriptions
+         WHERE property_id = %d
+         ORDER BY id DESC LIMIT 1",
+        $property_id
+    )
+);
+
+$package_assigned = !empty($subscription);
 
 /* ================= SAVE PACKAGE ================= */
 
@@ -50,43 +60,74 @@ if (isset($_POST['save_package'])) {
     $price        = floatval($_POST['package_price']);
     $addons       = $_POST['addons'] ?? [];
 
-    $wpdb->update(
-        "{$wpdb->prefix}pw_properties",
-        [
-            'subscription_status' => 'Package Assigned',
-            'package_type'  => $package_type,
-            'package_start' => $start_date,
-            'package_end'   => $end_date,
-            'package_price' => $price
-        ],
-        ['id'=>$property_id]
+    // Insert into subscriptions table
+$wpdb->insert(
+    "{$wpdb->prefix}pw_subscriptions",
+    [
+        'property_id'   => $property_id,
+        'package_type'  => $package_type,
+        'start_date'    => $start_date,
+        'end_date'      => $end_date,
+        'package_price' => $price,
+        'addons'        => json_encode($addons),
+        'status'        => 'Active'
+    ]
+);
+
+$subscription_id = $wpdb->insert_id;
+
+/* ================= RECREATE VISITS ================= */
+
+// Delete old visits
+$wpdb->delete(
+    "{$wpdb->prefix}pw_visits",
+    ['property_id' => $property_id]
+);
+
+// Decide duration & interval
+$duration = ($package_type == 'monthly') ? 12 : 
+            (($package_type == 'quarterly') ? 4 : 1);
+
+$interval = ($package_type == 'monthly') ? 1 : 
+            (($package_type == 'quarterly') ? 3 : 12);
+
+// Create visits
+for ($i = 0; $i < $duration; $i++) {
+
+    $visit_date = date(
+        'Y-m-d',
+        strtotime("+".($i * $interval)." month", strtotime($start_date))
     );
 
-    /* Recreate visits */
-    $wpdb->delete("{$wpdb->prefix}pw_visits", ['property_id'=>$property_id]);
+    $wpdb->insert(
+        "{$wpdb->prefix}pw_visits",
+        [
+            'property_id'    => $property_id,
+            'subscription_id'=> $subscription_id,
+            'visit_date'     => $visit_date,
+            'visit_status'   => 'Pending'
+        ]
+    );
+}
 
-    $duration = ($package_type=='monthly')?12:(($package_type=='quarterly')?4:1);
-    $interval = ($package_type=='monthly')?1:(($package_type=='quarterly')?3:12);
+/* ================= UPDATE PROPERTY STATUS ================= */
 
-    for($i=0;$i<$duration;$i++){
-        $visit_date = date('Y-m-d', strtotime("+".($i*$interval)." month", strtotime($start_date)));
-
-        $wpdb->insert("{$wpdb->prefix}pw_visits",[
-            'property_id'=>$property_id,
-            'visit_date'=>$visit_date,
-            'visit_status'=>'Pending'
-        ]);
-    }
+$wpdb->update(
+    "{$wpdb->prefix}pw_properties",
+    ['subscription_status' => 'Visits Created'],
+    ['id' => $property_id]
+);
+    
 
     /* Save addons */
-    $wpdb->delete("{$wpdb->prefix}pw_property_addons", ['property_id'=>$property_id]);
+    /*$wpdb->delete("{$wpdb->prefix}pw_property_addons", ['property_id'=>$property_id]);
 
     foreach($addons as $addon_id){
         $wpdb->insert("{$wpdb->prefix}pw_property_addons",[
             'property_id'=>$property_id,
             'addon_id'=>intval($addon_id)
         ]);
-    }
+    }*/
 
     echo "<script>window.location.href='?property_id=$property_id&tab=package';</script>";
     exit;
@@ -113,6 +154,11 @@ if (isset($_POST['assign_visit'])) {
         ],
         ['id'=>$visit_id]
     );
+    $wpdb->update(
+    "{$wpdb->prefix}pw_properties",
+    ['subscription_status' => 'Visit Assigned'],
+    ['id'=>$property_id]
+);
 
     echo "<script>window.location.href='?property_id=$property_id&tab=visit';</script>";
     exit;
@@ -122,12 +168,11 @@ if (isset($_POST['assign_visit'])) {
 
 $addons = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}pw_addons ORDER BY name ASC");
 
-$selected_addons = $wpdb->get_col(
-    $wpdb->prepare(
-        "SELECT addon_id FROM {$wpdb->prefix}pw_property_addons WHERE property_id=%d",
-        $property_id
-    )
-);
+$selected_addons = [];
+
+if ($subscription && !empty($subscription->addons)) {
+    $selected_addons = json_decode($subscription->addons, true);
+}
 
 $visits = $wpdb->get_results(
     $wpdb->prepare(
@@ -199,10 +244,30 @@ class="<?php echo ($tab=='visit')?'active':'';?>">Assign Visits</a>
 
 <div class="pw-readonly-card">
 <div class="pw-readonly-grid">
-<div><label>Package</label><span><?php echo $property->package_type;?></span></div>
-<div><label>Start Date</label><span><?php echo $property->package_start;?></span></div>
-<div><label>End Date</label><span><?php echo $property->package_end;?></span></div>
-<div><label>Price</label><span>₹<?php echo $property->package_price;?></span></div>
+<div><label>Package</label><span><?php echo esc_html($subscription->package_type ?? ''); ?></span></div>
+<div><label>Start Date</label><span><?php echo esc_html($subscription->start_date ?? ''); ?></span></div>
+<div><label>End Date</label><span><?php echo esc_html($subscription->end_date ?? ''); ?></span></div>
+<div><label>Price</label><span>₹<?php echo esc_html($subscription->package_price ?? ''); ?></span></div>
+<div style="grid-column: span 2;">
+    <label>Add-ons</label>
+    <span>
+        <?php
+        if (!empty($selected_addons)) {
+            $addon_names = [];
+
+            foreach ($addons as $addon) {
+                if (in_array($addon->id, $selected_addons)) {
+                    $addon_names[] = esc_html($addon->name);
+                }
+            }
+
+            echo implode(', ', $addon_names);
+        } else {
+            echo 'No Add-ons Selected';
+        }
+        ?>
+    </span>
+</div>
 </div>
 
 <a href="?property_id=<?php echo $property_id;?>&tab=package&edit=1"
@@ -220,25 +285,25 @@ class="pw-btn">Edit Package</a>
 <label>Package Type</label>
 <select name="package_type" required>
 <option value="">Select Package</option>
-<option value="monthly" <?php selected($property->package_type,'monthly');?>>Monthly</option>
-<option value="quarterly" <?php selected($property->package_type,'quarterly');?>>Quarterly</option>
-<option value="yearly" <?php selected($property->package_type,'yearly');?>>Yearly</option>
+<option value="monthly" <?php selected($subscription->package_type ?? '', 'monthly'); ?>>Monthly</option>
+<option value="quarterly" <?php selected($subscription->package_type ?? '', 'quarterly'); ?>>Quarterly</option>
+<option value="yearly" <?php selected($subscription->package_type ?? '', 'yearly'); ?>>Yearly</option>
 </select>
 </div>
 
 <div>
 <label>Start Date</label>
-<input type="date" name="start_date" value="<?php echo esc_attr($property->package_start);?>" required>
+<input type="date" name="start_date" value="<?php echo esc_attr($subscription->start_date ?? '');?>" required>
 </div>
 
 <div>
 <label>End Date</label>
-<input type="date" name="end_date" value="<?php echo esc_attr($property->package_end);?>" required>
+<input type="date" name="end_date" value="<?php echo esc_attr($subscription->end_date ?? '');?>" required>
 </div>
 
 <div>
 <label>Package Price</label>
-<input type="number" name="package_price" value="<?php echo esc_attr($property->package_price);?>">
+<input type="number" name="package_price" value="<?php echo esc_attr($subscription->package_price ?? '');?>">
 </div>
 
 </div>
@@ -285,10 +350,12 @@ class="pw-btn">Edit Package</a>
 <?php wp_nonce_field('pw_assign_visit_nonce'); ?>
 <input type="hidden" name="visit_id" value="<?php echo $visit->id; ?>">
 
-<td><input type="date" name="visit_date" value="<?php echo esc_attr($visit->visit_date); ?>"></td>
-
 <td>
-<select name="engineer_id">
+    <input class="pw-input" type="date" name="visit_date" 
+        value="<?php echo esc_attr($visit->visit_date); ?>">
+</td>
+<td>
+<select class="pw-input" name="engineer_id">
 <option value="">Select</option>
 <?php foreach($engineers as $eng): ?>
 <option value="<?php echo $eng->ID; ?>" <?php selected($visit->engineer_id,$eng->ID); ?>>
@@ -305,11 +372,13 @@ class="pw-btn">Edit Package</a>
 </td>
 
 <td>
-<input type="text" name="comments" value="<?php echo esc_attr($visit->notes); ?>">
+<input class="pw-input" type="text" name="comments" value="<?php echo esc_attr($visit->notes); ?>">
+
 </td>
 
 <td>
-<button name="assign_visit" class="pw-btn">Save</button>
+
+<button name="assign_visit" class="pw-btn pw-small-btn">Save</button>
 </td>
 
 </form>
