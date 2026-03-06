@@ -154,9 +154,38 @@ if (isset($_POST['assign_visit'])) {
         ],
         ['id'=>$visit_id]
     );
-    $wpdb->update(
+    /* ================= UPDATE PROPERTY STATUS ================= */
+
+$total_visits = $wpdb->get_var(
+    $wpdb->prepare(
+        "SELECT COUNT(*) FROM {$wpdb->prefix}pw_visits WHERE property_id=%d",
+        $property_id
+    )
+);
+
+$completed_visits = $wpdb->get_var(
+$wpdb->prepare(
+"SELECT COUNT(*) FROM {$wpdb->prefix}pw_visits 
+WHERE property_id=%d AND visit_status='Completed'",
+$property_id
+)
+);
+
+$scheduled_visits = $wpdb->get_var(
+$wpdb->prepare(
+"SELECT COUNT(*) FROM {$wpdb->prefix}pw_visits 
+WHERE property_id=%d AND visit_status='Scheduled'",
+$property_id
+)
+);
+
+$current = $completed_visits + $scheduled_visits;
+
+$status = "Visit " . $current . "/" . $total_visits . " Scheduled";
+
+$wpdb->update(
     "{$wpdb->prefix}pw_properties",
-    ['subscription_status' => 'Visit Assigned'],
+    ['subscription_status' => $status],
     ['id'=>$property_id]
 );
 

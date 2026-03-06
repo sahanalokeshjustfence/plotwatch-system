@@ -143,6 +143,9 @@ $tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : '';
         if (is_page('update-visit')) {
             include PW_PATH . 'templates/update-visit.php';
         }
+        if (is_page('visit-details')) {
+    include PW_PATH . 'templates/visit-details.php';
+}
 
         if (is_page('manage-addons')) {
             include PW_PATH . 'templates/manage-addons.php';

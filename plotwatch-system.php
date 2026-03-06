@@ -30,7 +30,7 @@ define('PW_STATUS_PENDING', 'Pending Package Assignment');
 
 define('PW_STATUS_VISITS_CREATED', 'Visits Created');
 
-define('PW_STATUS_VISIT_ASSIGNED', 'Visit Assigned');
+//define('PW_STATUS_VISIT_ASSIGNED', 'Visit Assigned');
 
 //define('PW_STATUS_VISIT_IN_PROGRESS', 'Visit In Progress');
 
@@ -308,9 +308,22 @@ add_action('wp_footer', 'pw_global_footer');
 
 function pw_global_footer() {
 
+    if (!is_page([
+        'login',
+        'register',
+        'customer-dashboard',
+        'operation-dashboard',
+        'engineer-dashboard',
+        'assign-package',
+        'add-property',
+        'customer-profile',
+        'manage-addons'
+    ])) {
+        return;
+    }
+
     echo '<div class="pw-footer-global">'
         . date('Y') .
         ' © Dextra Square Private Limited
     </div>';
-
 }

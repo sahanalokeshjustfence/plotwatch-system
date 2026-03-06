@@ -50,28 +50,44 @@ $visits = $wpdb->get_results(
 <td><?php echo esc_html($visit->visit_date); ?></td>
 
 <td>
+
 <?php
 $visit_status_class = 'pw-status-pending';
+$today = date('Y-m-d');
 
-switch ($visit->visit_status) {
+/* ============================================
+   OVERDUE CHECK
+============================================ */
 
-    case 'Scheduled':
-        $visit_status_class = 'pw-status-warning';
-        break;
+if ($visit->visit_status != 'Completed' && $visit->visit_date < $today) {
 
-    case 'Completed':
-        $visit_status_class = 'pw-status-completed';
-        break;
+    $visit->visit_status = "Overdue";
+    $visit_status_class = 'pw-status-overdue';
 
-    case 'Pending':
-    default:
-        $visit_status_class = 'pw-status-pending';
+} else {
+
+    switch ($visit->visit_status) {
+
+        case 'Scheduled':
+            $visit_status_class = 'pw-status-scheduled';
+            break;
+
+        case 'Completed':
+            $visit_status_class = 'pw-status-completed';
+            break;
+
+        case 'Pending':
+        default:
+            $visit_status_class = 'pw-status-pending';
+            break;
+    }
 }
 ?>
 
 <span class="pw-status-badge <?php echo esc_attr($visit_status_class); ?>">
     <?php echo esc_html($visit->visit_status); ?>
 </span>
+
 </td>
 
 <td>
