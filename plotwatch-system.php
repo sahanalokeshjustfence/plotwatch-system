@@ -327,3 +327,4 @@ function pw_global_footer() {
         ' © Dextra Square Private Limited
     </div>';
 }
+

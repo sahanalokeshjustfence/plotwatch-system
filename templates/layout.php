@@ -23,141 +23,179 @@ $tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : '';
 
 <div class="pw-app">
 
-    <!-- SIDEBAR -->
-    <aside class="pw-sidebar">
+<!-- SIDEBAR -->
+<aside class="pw-sidebar">
 
-        <div class="pw-logo">
-            <img src="<?php echo esc_url(PW_URL . 'assets/images/logo.png'); ?>" alt="PlotWatch Logo">
-        </div>
+<div class="pw-logo">
+<img src="<?php echo esc_url(PW_URL . 'assets/images/logo.png'); ?>" alt="PlotWatch Logo">
+</div>
 
-        <nav>
+<div class="pw-sidebar-toggle" onclick="toggleSidebar()">
 
-        <?php if ($role === 'customer'): ?>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+<path d="M9 6L15 12L9 18" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
 
-            <a href="<?php echo esc_url(home_url('/customer-dashboard')); ?>"
-               class="<?php echo (is_page('customer-dashboard') && empty($tab)) ? 'active' : ''; ?>">
-               Dashboard
-            </a>
+</div>
 
-            <a href="<?php echo esc_url(home_url('/add-property')); ?>"
-               class="<?php echo is_page('add-property') ? 'active' : ''; ?>">
-               Add Property
-            </a>
+<nav>
 
-            <a href="<?php echo esc_url(home_url('/customer-dashboard?tab=my-properties')); ?>"
-               class="<?php echo ($tab === 'my-properties') ? 'active' : ''; ?>">
-               My Properties
-            </a>
+<?php if ($role === 'customer'): ?>
 
-            <a href="<?php echo esc_url(home_url('/customer-profile')); ?>"
-               class="<?php echo is_page('customer-profile') ? 'active' : ''; ?>">
-               Profile
-            </a>
+<a href="<?php echo esc_url(home_url('/customer-dashboard')); ?>"
+class="<?php echo (is_page('customer-dashboard') && empty($tab)) ? 'active' : ''; ?>">
+Dashboard
+</a>
 
-        <?php elseif ($role === 'operation_member'): ?>
+<a href="<?php echo esc_url(home_url('/add-property')); ?>"
+class="<?php echo is_page('add-property') ? 'active' : ''; ?>">
+Add Property
+</a>
 
-            <a href="<?php echo esc_url(home_url('/operation-dashboard')); ?>"
-               class="<?php echo (is_page('operation-dashboard') && empty($tab)) ? 'active' : ''; ?>">
-               Dashboard
-            </a>
+<a href="<?php echo esc_url(home_url('/customer-dashboard?tab=my-properties')); ?>"
+class="<?php echo ($tab === 'my-properties') ? 'active' : ''; ?>">
+My Properties
+</a>
 
-            <a href="<?php echo esc_url(home_url('/operation-dashboard?tab=new')); ?>"
-               class="<?php echo ($tab === 'new') ? 'active' : ''; ?>">
-               New Properties
-            </a>
+<a href="<?php echo esc_url(home_url('/customer-profile')); ?>"
+class="<?php echo is_page('customer-profile') ? 'active' : ''; ?>">
+Profile
+</a>
 
-            <!-- Assigned & Completed REMOVED -->
+<?php elseif ($role === 'operation_member'): ?>
 
-            <a href="<?php echo esc_url(home_url('/manage-addons')); ?>"
-               class="<?php echo is_page('manage-addons') ? 'active' : ''; ?>">
-               Manage Add-ons
-            </a>
+<a href="<?php echo esc_url(home_url('/operation-dashboard')); ?>"
+class="<?php echo (is_page('operation-dashboard') && empty($tab)) ? 'active' : ''; ?>">
+Dashboard
+</a>
 
-        <?php elseif ($role === 'engineer'): ?>
+<a href="<?php echo esc_url(home_url('/operation-dashboard?tab=new')); ?>"
+class="<?php echo ($tab === 'new') ? 'active' : ''; ?>">
+New Properties
+</a>
 
-            <a href="<?php echo esc_url(home_url('/engineer-dashboard')); ?>"
-               class="<?php echo (is_page('engineer-dashboard') && empty($tab)) ? 'active' : ''; ?>">
-               Dashboard
-            </a>
+<a href="<?php echo esc_url(home_url('/manage-addons')); ?>"
+class="<?php echo is_page('manage-addons') ? 'active' : ''; ?>">
+Manage Add-ons
+</a>
 
-            <a href="<?php echo esc_url(home_url('/engineer-dashboard')); ?>">
-               Assigned Properties
-            </a>
+<?php elseif ($role === 'engineer'): ?>
 
-            <a href="<?php echo esc_url(home_url('/engineer-dashboard?tab=completed')); ?>"
-               class="<?php echo ($tab === 'completed') ? 'active' : ''; ?>">
-               Completed Visits
-            </a>
+<a href="<?php echo esc_url(home_url('/engineer-dashboard')); ?>"
+class="<?php echo (is_page('engineer-dashboard') && empty($tab)) ? 'active' : ''; ?>">
+Dashboard
+</a>
 
-        <?php endif; ?>
+<a href="<?php echo esc_url(home_url('/engineer-dashboard')); ?>">
+Assigned Properties
+</a>
 
-        </nav>
+<a href="<?php echo esc_url(home_url('/engineer-dashboard?tab=completed')); ?>"
+class="<?php echo ($tab === 'completed') ? 'active' : ''; ?>">
+Completed Visits
+</a>
 
-    </aside>
+<?php endif; ?>
 
-    <!-- MAIN -->
-    <main class="pw-main">
+</nav>
 
-        <header class="pw-header">
-            <div>
-                Welcome, <?php echo esc_html($user->display_name); ?>
-            </div>
+</aside>
 
-            <a class="pw-logout"
-               href="<?php echo esc_url(wp_logout_url(home_url('/login'))); ?>">
-               Logout
-            </a>
-        </header>
 
-        <section class="pw-content">
+<!-- MAIN -->
+<main class="pw-main">
 
-        <?php
-        /* =========================
-           PAGE LOADER
-        ========================== */
+<header class="pw-header">
 
-        if (is_page('customer-dashboard')) {
-            include PW_PATH . 'templates/dashboard.php';
-        }
+<div class="pw-mobile-menu" onclick="toggleSidebar()">☰</div>
 
-        if (is_page('add-property')) {
-            include PW_PATH . 'templates/add-property.php';
-        }
+<div>
+Welcome, <?php echo esc_html($user->display_name); ?>
+</div>
 
-        if (is_page('customer-profile')) {
-            include PW_PATH . 'templates/profile.php';
-        }
+<a class="pw-logout"
+href="<?php echo esc_url(wp_logout_url(home_url('/login'))); ?>">
+Logout
+</a>
 
-        if (is_page('operation-dashboard')) {
-            include PW_PATH . 'templates/operation-dashboard.php';
-        }
+</header>
 
-        if (is_page('engineer-dashboard')) {
-            include PW_PATH . 'templates/engineer-dashboard.php';
-        }
 
-        if (is_page('assign-package')) {
-            include PW_PATH . 'templates/assign-package.php';
-        }
+<section class="pw-content">
 
-        if (is_page('update-visit')) {
-            include PW_PATH . 'templates/update-visit.php';
-        }
-        if (is_page('visit-details')) {
-    include PW_PATH . 'templates/visit-details.php';
+<?php
+
+if (is_page('customer-dashboard')) {
+include PW_PATH . 'templates/dashboard.php';
 }
 
-        if (is_page('manage-addons')) {
-            include PW_PATH . 'templates/manage-addons.php';
-        }
-        ?>
+if (is_page('add-property')) {
+include PW_PATH . 'templates/add-property.php';
+}
 
-        </section>
+if (is_page('customer-profile')) {
+include PW_PATH . 'templates/profile.php';
+}
 
-    </main>
+if (is_page('operation-dashboard')) {
+include PW_PATH . 'templates/operation-dashboard.php';
+}
+
+if (is_page('engineer-dashboard')) {
+include PW_PATH . 'templates/engineer-dashboard.php';
+}
+
+if (is_page('assign-package')) {
+include PW_PATH . 'templates/assign-package.php';
+}
+
+if (is_page('update-visit')) {
+include PW_PATH . 'templates/update-visit.php';
+}
+
+if (is_page('visit-details')) {
+include PW_PATH . 'templates/visit-details.php';
+}
+
+if (is_page('visit-reports')) {
+include PW_PATH . 'templates/visit-reports.php';
+}
+
+if (is_page('manage-addons')) {
+include PW_PATH . 'templates/manage-addons.php';
+}
+
+?>
+
+</section>
+
+</main>
 
 </div>
 
 <?php wp_footer(); ?>
+
+<script>
+
+function toggleSidebar(){
+
+let sidebar=document.querySelector(".pw-sidebar");
+let main=document.querySelector(".pw-main");
+
+if(window.innerWidth < 768){
+
+sidebar.classList.toggle("open");
+
+}else{
+
+sidebar.classList.toggle("collapsed");
+main.classList.toggle("expanded");
+
+}
+
+}
+
+</script>
+
 </body>
 </html>

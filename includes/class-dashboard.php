@@ -39,7 +39,8 @@ class PW_Dashboard {
             is_page('assign-package') ||
             is_page('manage-addons') ||
             is_page('update-visit') ||
-            is_page('visit-details')
+            is_page('visit-details') ||
+            is_page('visit-reports')
         ) {
             return PW_PATH . 'templates/layout.php';
         }

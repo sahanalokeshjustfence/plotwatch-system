@@ -407,7 +407,21 @@ class="pw-btn">Edit Package</a>
 
 <td>
 
-<button name="assign_visit" class="pw-btn pw-small-btn">Save</button>
+<?php if($visit->visit_status == 'Completed'): ?>
+
+<a href="<?php echo esc_url(home_url('/visit-reports?visit_id='.$visit->id)); ?>" 
+class="pw-btn pw-view-btn">
+View
+</a>
+
+<?php else: ?>
+
+<button name="assign_visit" class="pw-btn pw-small-btn">
+Save
+</button>
+
+<?php endif; ?>
+
 </td>
 
 </form>

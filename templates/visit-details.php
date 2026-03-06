@@ -21,6 +21,11 @@ $engineer_id = $current_user->ID;
 
 $visit_comment = sanitize_textarea_field($_POST['visit_comment']);
 $actual_date = sanitize_text_field($_POST['actual_date']);
+$inspection_status = sanitize_text_field($_POST['inspection_status']);
+$surrounding_activity = sanitize_text_field($_POST['surrounding_activity']);
+$security_risk = sanitize_text_field($_POST['security_risk']);
+$boundary_security = sanitize_text_field($_POST['boundary_security']);
+$encroachment_check = sanitize_text_field($_POST['encroachment_check']);
 
 $photos=[];
 $videos=[];
@@ -82,9 +87,16 @@ $wpdb->prefix.'pw_visits',
 [
 'visit_status'=>'Completed',
 'visit_date'=>$actual_date,
-'notes'=>$visit_comment,
+'visit_comment'=>$visit_comment,
 'visit_photos'=>implode(',',$photos),
-'visit_videos'=>implode(',',$videos)
+'visit_videos'=>implode(',',$videos),
+
+'inspection_status'=>$inspection_status,
+'surrounding_activity'=>$surrounding_activity,
+'security_risk'=>$security_risk,
+'boundary_security'=>$boundary_security,
+'encroachment_check'=>$encroachment_check
+
 ],
 ['id'=>$visit_id]
 );
@@ -232,6 +244,82 @@ Visit Not Scheduled Yet
 <label>Visit Comment</label>
 <textarea name="visit_comment" required></textarea>
 </div>
+<div class="pw-inspection-box">
+
+<h3>Inspection Questions</h3>
+
+<div class="pw-question">
+
+<label>Overall Inspection Status</label>
+
+<select name="inspection_status" required>
+<option value="">Select</option>
+<option>Property Safe</option>
+<option>Needs Maintenance</option>
+<option>Immediate Attention Required</option>
+</select>
+
+</div>
+
+
+<div class="pw-question">
+
+<label>Surrounding Area Activity</label>
+
+<select name="surrounding_activity" required>
+<option value="">Select</option>
+<option>Residential Development</option>
+<option>Agricultural Activity</option>
+<option>Commercial Activity</option>
+<option>No Major Activity</option>
+</select>
+
+</div>
+
+
+<div class="pw-question">
+
+<label>Security Risk Assessment</label>
+
+<select name="security_risk" required>
+<option value="">Select</option>
+<option>No Risk</option>
+<option>Minor Risk</option>
+<option>High Risk</option>
+</select>
+
+</div>
+
+
+<div class="pw-question">
+
+<label>Boundary Security</label>
+
+<select name="boundary_security" required>
+<option value="">Select</option>
+<option>Good Condition</option>
+<option>Minor Damage</option>
+<option>Major Damage</option>
+<option>Not Available</option>
+</select>
+
+</div>
+
+
+<div class="pw-question">
+
+<label>Encroachment Check</label>
+
+<select name="encroachment_check" required>
+<option value="">Select</option>
+<option>No Encroachment</option>
+<option>Suspected Encroachment</option>
+<option>Confirmed Encroachment</option>
+</select>
+
+</div>
+
+</div>
 
 
 <div class="pw-field">
@@ -275,46 +363,63 @@ $media[]=['type'=>'video','src'=>$v];
 
 <?php if(!empty($media)): ?>
 
+
+
 <div class="pw-gallery">
 
 <button class="pw-arrow left" onclick="prevMedia()">❮</button>
 
 <div id="mediaContainer"></div>
+<div class="pw-dots" id="pwDots"></div>
 
 <button class="pw-arrow right" onclick="nextMedia()">❯</button>
 
-</div>
+</div> <!-- gallery -->
 
-<div class="pw-thumbs">
 
-<?php foreach($media as $index=>$m): ?>
 
-<?php if($m['type']=='image'): ?>
-
-<img src="<?php echo esc_url($m['src']); ?>"
-onclick="changeMedia(<?php echo $index; ?>)"
-class="pw-thumb">
-
-<?php else: ?>
-
-<video class="pw-thumb"
-onclick="changeMedia(<?php echo $index; ?>)">
-<source src="<?php echo esc_url($m['src']); ?>">
-</video>
-
-<?php endif; ?>
-
-<?php endforeach; ?>
-
-</div>
 
 <?php endif; ?>
 
 <div class="pw-visit-report">
+    <div class="pw-inspection-report">
+
+<h3>Inspection Summary</h3>
+
+<div class="pw-report-grid">
+
+<div>
+<label>Inspection Status</label>
+<span><?php echo esc_html($visit->inspection_status); ?></span>
+</div>
+
+<div>
+<label>Surrounding Activity</label>
+<span><?php echo esc_html($visit->surrounding_activity); ?></span>
+</div>
+
+<div>
+<label>Security Risk</label>
+<span><?php echo esc_html($visit->security_risk); ?></span>
+</div>
+
+<div>
+<label>Boundary Security</label>
+<span><?php echo esc_html($visit->boundary_security); ?></span>
+</div>
+
+<div>
+<label>Encroachment</label>
+<span><?php echo esc_html($visit->encroachment_check); ?></span>
+</div>
+
+</div>
+
+</div>
 
 <h3>Visit Report</h3>
 
-<p><?php echo nl2br(esc_html($visit->notes)); ?></p>
+<p><?php echo nl2br(esc_html($visit->visit_comment)); ?></p>
 
 <p><strong>Date:</strong> <?php echo esc_html($visit->visit_date); ?></p>
 
@@ -330,7 +435,7 @@ let media=[
 <?php
 if(!empty($media)){
 foreach($media as $m){
-echo "{type:'".$m['type']."',src:'".esc_url($m['src'])."'},"; 
+echo "{type:'".$m['type']."',src:'".esc_url($m['src'])."'},";
 }
 }
 ?>
@@ -339,28 +444,50 @@ echo "{type:'".$m['type']."',src:'".esc_url($m['src'])."'},";
 let index=0;
 
 const container=document.getElementById("mediaContainer");
+const dots=document.getElementById("pwDots");
+
+function renderDots(){
+
+dots.innerHTML="";
+
+media.forEach((m,i)=>{
+
+let dot=document.createElement("span");
+dot.className="pw-dot";
+
+if(i===index){
+dot.classList.add("active");
+}
+
+dot.onclick=()=>changeMedia(i);
+
+dots.appendChild(dot);
+
+});
+
+}
 
 function renderMedia(){
 
-if(!container || media.length==0) return;
+if(media.length===0) return;
 
 let item=media[index];
 
 if(item.type==="image"){
 
-container.innerHTML=`<img src="${item.src}" style="width:100%">`;
+container.innerHTML=`<img src="${item.src}">`;
 
 }else{
 
-container.innerHTML=`<video controls style="width:100%">
+container.innerHTML=`<video controls>
 <source src="${item.src}">
 </video>`;
 
 }
 
-}
+renderDots();
 
-renderMedia();
+}
 
 function changeMedia(i){
 index=i;
@@ -378,5 +505,7 @@ index--;
 if(index<0) index=media.length-1;
 renderMedia();
 }
+
+renderMedia();
 
 </script>
