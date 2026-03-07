@@ -197,5 +197,37 @@ main.classList.toggle("expanded");
 
 </script>
 
+<?php
+$user = wp_get_current_user();
+?>
+
+<script>
+var Tawk_API = Tawk_API || {};
+
+Tawk_API.onLoad = function(){
+
+Tawk_API.setAttributes({
+
+'name' : '<?php echo esc_js($user->display_name); ?>',
+'email' : '<?php echo esc_js($user->user_email); ?>',
+'role' : '<?php echo esc_js(implode(",", $user->roles)); ?>'
+
+}, function(error){});
+
+};
+</script>
+<!--Start of Tawk.to Script-->
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/69abd6378210ea1c360146a5/1jj3jpipb';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+<!--End of Tawk.to Script-->
 </body>
 </html>
