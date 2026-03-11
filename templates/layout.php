@@ -3,6 +3,11 @@ if (!is_user_logged_in()) {
     wp_safe_redirect(home_url('/login'));
     exit;
 }
+global $post;
+if ($post) {
+    $GLOBALS['wp_query']->is_404 = false;
+}
+
 
 $user  = wp_get_current_user();
 $roles = (array) $user->roles;
@@ -125,43 +130,59 @@ Logout
 
 <?php
 
-if (is_page('customer-dashboard')) {
+/* ===== FIX START ===== */
+global $post;
+
+$slug = '';
+if ($post && isset($post->post_name)) {
+    $slug = $post->post_name;
+}
+
+/* fallback if WordPress does not set $post */
+if (!$slug) {
+    $uri = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
+    $parts = explode('/', $uri);
+    $slug = end($parts);
+}
+/* ===== FIX END ===== */
+
+if (is_page('customer-dashboard') || $slug === 'customer-dashboard') {
 include PW_PATH . 'templates/dashboard.php';
 }
 
-if (is_page('add-property')) {
+if (is_page('add-property') || $slug === 'add-property') {
 include PW_PATH . 'templates/add-property.php';
 }
 
-if (is_page('customer-profile')) {
+if (is_page('customer-profile') || $slug === 'customer-profile') {
 include PW_PATH . 'templates/profile.php';
 }
 
-if (is_page('operation-dashboard')) {
+if (is_page('operation-dashboard') || $slug === 'operation-dashboard') {
 include PW_PATH . 'templates/operation-dashboard.php';
 }
 
-if (is_page('engineer-dashboard')) {
+if (is_page('engineer-dashboard') || $slug === 'engineer-dashboard') {
 include PW_PATH . 'templates/engineer-dashboard.php';
 }
 
-if (is_page('assign-package')) {
+if (is_page('assign-package') || $slug === 'assign-package') {
 include PW_PATH . 'templates/assign-package.php';
 }
 
-if (is_page('update-visit')) {
+if (is_page('update-visit') || $slug === 'update-visit') {
 include PW_PATH . 'templates/update-visit.php';
 }
 
-if (is_page('visit-details')) {
+if (is_page('visit-details') || $slug === 'visit-details') {
 include PW_PATH . 'templates/visit-details.php';
 }
 
-if (is_page('visit-reports')) {
+if (is_page('visit-reports') || $slug === 'visit-reports') {
 include PW_PATH . 'templates/visit-reports.php';
 }
 
-if (is_page('manage-addons')) {
+if (is_page('manage-addons') || $slug === 'manage-addons') {
 include PW_PATH . 'templates/manage-addons.php';
 }
 
@@ -216,6 +237,7 @@ Tawk_API.setAttributes({
 
 };
 </script>
+
 <!--Start of Tawk.to Script-->
 <script type="text/javascript">
 var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
@@ -229,5 +251,10 @@ s0.parentNode.insertBefore(s1,s0);
 })();
 </script>
 <!--End of Tawk.to Script-->
+
+
+<div id="pw-loader">
+    <div class="pw-spinner"></div>
+</div>
 </body>
 </html>

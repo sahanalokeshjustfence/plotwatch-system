@@ -9,39 +9,43 @@ class PW_Dashboard {
 
     public function load_templates($template) {
 
-        // AUTH PAGES (Login / Register)
-        if (is_page(['login','register'])) {
+        global $post;
+
+        $slug = '';
+
+        // 1️⃣ Get slug from WP post object
+        if ($post && isset($post->post_name)) {
+            $slug = $post->post_name;
+        }
+
+        // 2️⃣ Fallback: detect slug from URL
+        if (!$slug) {
+            $uri = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
+            $parts = explode('/', $uri);
+            $slug = end($parts);
+        }
+
+        // AUTH PAGES
+        if (in_array($slug, ['login','register'])) {
             return PW_PATH . 'templates/auth-layout.php';
         }
 
-        // CUSTOMER PAGES
-        if (
-            is_page('customer-dashboard') ||
-            is_page('add-property') ||
-            is_page('customer-profile') ||
-            is_page('my-properties')
-        ) {
-            return PW_PATH . 'templates/layout.php';
-        }
+        // ALL DASHBOARD PAGES
+        $pages = [
+            'customer-dashboard',
+            'add-property',
+            'customer-profile',
+            'my-properties',
+            'operation-dashboard',
+            'engineer-dashboard',
+            'assign-package',
+            'manage-addons',
+            'update-visit',
+            'visit-details',
+            'visit-reports'
+        ];
 
-        // OPERATION DASHBOARD
-        if (is_page('operation-dashboard')) {
-            return PW_PATH . 'templates/layout.php';
-        }
-
-        // ENGINEER DASHBOARD
-        if (is_page('engineer-dashboard')) {
-            return PW_PATH . 'templates/layout.php';
-        }
-
-        // OTHER CUSTOM PAGES
-        if (
-            is_page('assign-package') ||
-            is_page('manage-addons') ||
-            is_page('update-visit') ||
-            is_page('visit-details') ||
-            is_page('visit-reports')
-        ) {
+        if (in_array($slug, $pages)) {
             return PW_PATH . 'templates/layout.php';
         }
 

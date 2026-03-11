@@ -8,10 +8,82 @@ class PW_Auth {
         add_shortcode('pw_login', [$this, 'login_form']);
         add_shortcode('pw_register', [$this, 'register_form']);
 
+        add_action('init', [$this, 'handle_login']);
         add_action('init', [$this, 'handle_register']);
         add_action('init', [$this, 'verify_account']);
 
         add_filter('authenticate', [$this, 'block_unverified'], 30, 3);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | HANDLE LOGIN
+    |--------------------------------------------------------------------------
+    */
+
+    public function handle_login() {
+
+        if (!isset($_POST['pw_login'])) return;
+
+        $email = sanitize_email($_POST['email'] ?? '');
+        $password = $_POST['password'] ?? '';
+
+        $creds = [
+            'user_login'    => $email,
+            'user_password' => $password,
+            'remember'      => true
+        ];
+
+        $user = wp_signon($creds, false);
+
+        if (is_wp_error($user)) {
+
+            wp_safe_redirect(home_url('/login?error=1'));
+            exit;
+
+        }
+
+        wp_set_current_user($user->ID);
+        wp_set_auth_cookie($user->ID);
+
+        /*
+        |--------------------------------------------------------------------------
+        | ROLE BASED REDIRECT
+        |--------------------------------------------------------------------------
+        */
+
+        if (in_array('customer', (array) $user->roles)) {
+
+            wp_safe_redirect(home_url('/customer-dashboard'));
+            exit;
+
+        }
+
+        if (in_array('operation_member', (array) $user->roles)) {
+
+            wp_safe_redirect(home_url('/operation-dashboard'));
+            exit;
+
+        }
+
+        if (in_array('engineer', (array) $user->roles)) {
+
+            wp_safe_redirect(home_url('/engineer-dashboard'));
+            exit;
+
+        }
+
+        if (in_array('administrator', (array) $user->roles)) {
+
+            wp_safe_redirect(admin_url());
+            exit;
+
+        }
+
+        /* fallback */
+
+        wp_safe_redirect(home_url());
+        exit;
     }
 
     /*
@@ -24,17 +96,18 @@ class PW_Auth {
 
         if (!isset($_POST['pw_register'])) return;
 
-        if (!wp_verify_nonce($_POST['_wpnonce'], 'pw_register_nonce')) {
+        if (!isset($_POST['_wpnonce']) ||
+            !wp_verify_nonce($_POST['_wpnonce'], 'pw_register_nonce')) {
             wp_die('Security failed');
         }
 
         global $wpdb;
         $profile_table = $wpdb->prefix . 'pw_profile';
 
-        $name   = sanitize_text_field($_POST['name']);
-        $email  = sanitize_email($_POST['email']);
-        $pass   = $_POST['password'];
-        $mobile = sanitize_text_field($_POST['mobile']); // ✅ ADDED
+        $name   = sanitize_text_field($_POST['name'] ?? '');
+        $email  = sanitize_email($_POST['email'] ?? '');
+        $pass   = $_POST['password'] ?? '';
+        $mobile = sanitize_text_field($_POST['mobile'] ?? '');
 
         if (!is_email($email)) {
             wp_safe_redirect(home_url('/register?error=invalid'));
@@ -46,17 +119,10 @@ class PW_Auth {
             exit;
         }
 
-        // ✅ Mobile validation
         if (!preg_match('/^[0-9]{10}$/', $mobile)) {
             wp_safe_redirect(home_url('/register?error=mobile'));
             exit;
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | ONLY CREATE CUSTOMER ROLE
-        |--------------------------------------------------------------------------
-        */
 
         $user_id = wp_insert_user([
             'user_login'   => $email,
@@ -68,12 +134,6 @@ class PW_Auth {
 
         if (!is_wp_error($user_id)) {
 
-            /*
-            |--------------------------------------------------------------------------
-            | INSERT MOBILE INTO pw_profile TABLE  ✅ ADDED
-            |--------------------------------------------------------------------------
-            */
-
             $wpdb->insert(
                 $profile_table,
                 [
@@ -84,12 +144,6 @@ class PW_Auth {
                 ],
                 ['%d','%s','%s','%s']
             );
-
-            /*
-            |--------------------------------------------------------------------------
-            | EMAIL VERIFICATION
-            |--------------------------------------------------------------------------
-            */
 
             update_user_meta($user_id, 'pw_verified', 0);
 
@@ -128,8 +182,8 @@ PlotWatch Team
 
         if (!isset($_GET['pw_verify'])) return;
 
-        $user_id = intval($_GET['uid']);
-        $token   = sanitize_text_field($_GET['token']);
+        $user_id = intval($_GET['uid'] ?? 0);
+        $token   = sanitize_text_field($_GET['token'] ?? '');
 
         $saved_token = get_user_meta($user_id, 'pw_verify_token', true);
 
@@ -154,21 +208,9 @@ PlotWatch Team
         if (is_wp_error($user)) return $user;
         if (!$user) return $user;
 
-        /*
-        |--------------------------------------------------------------------------
-        | ADMIN CAN LOGIN ALWAYS
-        |--------------------------------------------------------------------------
-        */
-
         if (in_array('administrator', (array)$user->roles)) {
             return $user;
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | CUSTOMER MUST BE VERIFIED
-        |--------------------------------------------------------------------------
-        */
 
         if (in_array('customer', (array)$user->roles)) {
 
@@ -181,12 +223,6 @@ PlotWatch Team
                 );
             }
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | OPERATION MEMBER & ENGINEER
-        |--------------------------------------------------------------------------
-        */
 
         if (in_array('operation_member', (array)$user->roles) ||
             in_array('engineer', (array)$user->roles)) {
@@ -211,7 +247,7 @@ PlotWatch Team
 
     /*
     |--------------------------------------------------------------------------
-    | REGISTER TEMPLATE (Only for customers)
+    | REGISTER TEMPLATE
     |--------------------------------------------------------------------------
     */
 

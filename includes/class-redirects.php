@@ -28,6 +28,9 @@ class PW_Redirects {
         if (in_array('engineer', (array) $user->roles)) {
             return home_url('/engineer-dashboard');
         }
+        if (in_array('administrator', (array) $user->roles)) {
+    return admin_url();
+}
 
         // Default (admin or others)
         return $redirect_to;
