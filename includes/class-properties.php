@@ -37,7 +37,7 @@ class PW_Properties {
                 'property_name'        => sanitize_text_field($_POST['property_name']),
                 'location_name'        => sanitize_text_field($_POST['location_name']),
                 'address'              => sanitize_textarea_field($_POST['address']),
-                'google_map' => esc_url_raw($_POST['google_map']),
+                'google_map'           => esc_url_raw($_POST['google_map']),
                 'plot_size'            => sanitize_text_field($_POST['plot_size']),
                 'property_type'        => sanitize_text_field($_POST['property_type']),
                 'contact_person'       => sanitize_text_field($_POST['contact_person']),
@@ -59,6 +59,19 @@ class PW_Properties {
                 ['property_code' => $property_code],
                 ['id' => $insert_id]
             );
+
+            /* 🔔 FETCH PROPERTY */
+
+            $property = $wpdb->get_row(
+                $wpdb->prepare(
+                    "SELECT * FROM $table WHERE id=%d",
+                    $insert_id
+                )
+            );
+
+            /* 🔔 SEND NOTIFICATION */
+
+            pw_notify_operation_team($property);
 
             wp_safe_redirect(home_url('/customer-dashboard?added=1'));
             exit;
@@ -100,7 +113,7 @@ class PW_Properties {
                 'property_name'        => sanitize_text_field($_POST['property_name']),
                 'location_name'        => sanitize_text_field($_POST['location_name']),
                 'address'              => sanitize_textarea_field($_POST['address']),
-                'google_map' => esc_url_raw($_POST['google_map']),
+                'google_map'           => esc_url_raw($_POST['google_map']),
                 'plot_size'            => sanitize_text_field($_POST['plot_size']),
                 'property_type'        => sanitize_text_field($_POST['property_type']),
                 'contact_person'       => sanitize_text_field($_POST['contact_person']),
@@ -140,7 +153,6 @@ class PW_Properties {
         $property_id = intval($_POST['property_id']);
         $addons = isset($_POST['addons']) ? json_encode($_POST['addons']) : '';
 
-        // Insert subscription
         $wpdb->insert(
             $wpdb->prefix . 'pw_subscriptions',
             [
@@ -153,7 +165,6 @@ class PW_Properties {
             ]
         );
 
-        // Update property
         $wpdb->update(
             $wpdb->prefix . 'pw_properties',
             [
@@ -193,7 +204,6 @@ class PW_Properties {
         $property_id = intval($_POST['property_id']);
         $media_url = '';
 
-        // File upload
         if (!empty($_FILES['media_file']['name'])) {
 
             require_once(ABSPATH . 'wp-admin/includes/file.php');
@@ -205,7 +215,6 @@ class PW_Properties {
             }
         }
 
-        // Insert log
         $wpdb->insert(
             $wpdb->prefix . 'pw_property_logs',
             [

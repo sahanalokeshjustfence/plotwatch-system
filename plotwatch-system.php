@@ -19,6 +19,9 @@ define('PW_URL', plugin_dir_url(__FILE__));
 define('PW_VERSION', '2.2');
 define('PW_DB_VERSION', '1.5');
 
+define('PW_WHATSAPP_TOKEN','EAALB4ZBAjTKwBQxuN9GQPZAwiPWZBnkI8gPvJtYfppQ5zvjLz70DcAIUo6GsZCKRLD88SLv4IGMZBXEYr6buPKBDYpylI7aLqorQy1rvURnjyjNsT3cxCqATcx1RvlWizlT5rMxhZBKf8yBuTZBREOLUhZCXW6HsQHZAXIu1Xx2zrJCiRPTqYKzhwoOOCxY0BgRJIzyuH6vYHZCiNCKVt28FpjYHpvPYn7oa8dSy9feUSMPsEKNA5hypI2MNJeNzObvgsxU0ZAWP5TN6r60kEjyFb67gInDDZCAZD');
+define('PW_PHONE_ID','1002191049648645');
+
 /*
 |--------------------------------------------------------------------------
 | STATUS CONSTANTS
@@ -209,6 +212,7 @@ require_once PW_PATH . 'includes/class-auth.php';
 require_once PW_PATH . 'includes/class-properties.php';
 require_once PW_PATH . 'includes/class-dashboard.php';
 require_once PW_PATH . 'includes/class-redirects.php';
+require_once PW_PATH.'includes/helper-notifications.php';
 
 /*
 |--------------------------------------------------------------------------
@@ -468,10 +472,14 @@ exit;
 
 
 function pw_log($msg){
+
     if(is_array($msg) || is_object($msg)){
         $msg = print_r($msg,true);
     }
-    error_log('[PLOTWATCH] '.$msg);
+
+    $time = current_time('Y-m-d H:i:s');
+
+    error_log("[PLOTWATCH $time] ".$msg);
 }
 
 add_action('template_redirect','pw_auth_redirect');
@@ -508,3 +516,4 @@ if(is_page(['login','register','forgot-password','reset-password'])){
 }
 
 }
+
