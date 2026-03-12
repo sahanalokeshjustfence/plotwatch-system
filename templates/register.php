@@ -1,6 +1,10 @@
 <?php
 if (!defined('ABSPATH')) exit;
 
+$error_code = isset($_GET['error']) ? sanitize_text_field($_GET['error']) : '';
+$error_code = trim($error_code,"/"); // IMPORTANT FIX
+$error = '';
+
 /*
 |--------------------------------------------------------------------------
 | REDIRECT IF ALREADY LOGGED IN (ROLE BASED)
@@ -38,11 +42,9 @@ if (is_user_logged_in()) {
 |--------------------------------------------------------------------------
 */
 
-$error = '';
+if ($error_code) {
 
-if (isset($_GET['error'])) {
-
-    switch ($_GET['error']) {
+    switch ($error_code) {
 
         case 'email':
             $error = "This email is already registered.";
@@ -54,6 +56,10 @@ if (isset($_GET['error'])) {
 
         case 'mobile':
             $error = "Mobile number must contain exactly 10 digits.";
+        break;
+
+        case 'password':
+            $error = "Passwords do not match.";
         break;
 
         default:
@@ -141,6 +147,54 @@ Login
 </div>
 
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<?php if($error_code): ?>
+<script>
+window.addEventListener('load', function() {
+
+<?php if($error_code=='email'): ?>
+
+Swal.fire({
+icon:'warning',
+title:'Already Registered',
+text:'This email is already registered.',
+confirmButtonColor:'#e31c3d'
+});
+
+<?php elseif($error_code=='invalid'): ?>
+
+Swal.fire({
+icon:'error',
+title:'Invalid Email',
+text:'Please enter a valid email address.',
+confirmButtonColor:'#e31c3d'
+});
+
+<?php elseif($error_code=='mobile'): ?>
+
+Swal.fire({
+icon:'error',
+title:'Invalid Mobile Number',
+text:'Mobile number must contain exactly 10 digits.',
+confirmButtonColor:'#e31c3d'
+});
+
+<?php elseif($error_code=='password'): ?>
+
+Swal.fire({
+icon:'error',
+title:'Password Mismatch',
+text:'Passwords do not match.',
+confirmButtonColor:'#e31c3d'
+});
+
+<?php endif; ?>
+
+});
+</script>
+<?php endif; ?>
 
 <script>
 

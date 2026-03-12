@@ -147,7 +147,13 @@ if (!$slug) {
 /* ===== FIX END ===== */
 
 if (is_page('customer-dashboard') || $slug === 'customer-dashboard') {
+
+if(empty($tab)){
+include PW_PATH . 'templates/customer-dashboard-home.php';
+}else{
 include PW_PATH . 'templates/dashboard.php';
+}
+
 }
 
 if (is_page('add-property') || $slug === 'add-property') {
@@ -256,5 +262,8 @@ s0.parentNode.insertBefore(s1,s0);
 <div id="pw-loader">
     <div class="pw-spinner"></div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="<?php echo PW_URL ?>assets/js/main.js"></script>
 </body>
 </html>

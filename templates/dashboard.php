@@ -5,6 +5,7 @@ global $wpdb;
 $user_id = get_current_user_id();
 $table = $wpdb->prefix . 'pw_properties';
 
+
 /* =====================================================
    UPDATE PROPERTY
 ===================================================== */

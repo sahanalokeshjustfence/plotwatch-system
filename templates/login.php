@@ -1,7 +1,28 @@
 <?php
 if (!defined('ABSPATH')) exit;
 
-$error = isset($_GET['error']) ? "Invalid email or password." : "";
+$error_code = isset($_GET['error']) ? sanitize_text_field($_GET['error']) : '';
+$error_code = trim($error_code,"/"); // IMPORTANT FIX
+$error = '';
+
+if($error_code){
+
+switch($error_code){
+
+case 'invalid':
+$error = "Invalid email or password.";
+break;
+
+case 'not_verified':
+$error = "Please verify your email before logging in.";
+break;
+
+default:
+$error = "Login failed. Please try again.";
+
+}
+
+}
 ?>
 
 <div class="pw-auth-wrapper">
@@ -60,6 +81,23 @@ Register
 </div>
 
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<?php if($error_code == 'invalid'): ?>
+<script>
+window.addEventListener('load', function() {
+
+Swal.fire({
+icon:'error',
+title:'Login Failed',
+text:'Invalid email or password.',
+confirmButtonColor:'#e31c3d'
+});
+
+});
+</script>
+<?php endif; ?>
 
 <script>
 

@@ -517,3 +517,72 @@ if(is_page(['login','register','forgot-password','reset-password'])){
 
 }
 
+///////////////////
+add_action('wp_footer','pw_support_widget');
+
+function pw_support_widget(){
+?>
+
+<div class="pw-support-toggle">
+    <span class="pw-phone-icon">☎</span>
+    Contact Us
+</div>
+
+<!-- SUPPORT BOX -->
+<div class="pw-support-widget">
+
+<div class="pw-support-header">
+Support
+<span class="pw-support-close">✕</span>
+</div>
+
+<div class="pw-support-body">
+
+<p class="pw-support-label">Address</p>
+<p>
+Dextra Square Pvt Ltd,<br>
+JRR Towers (II Floor), Pattalamma Temple Rd,<br>
+Basavanagudi, Bangalore - 560004
+</p>
+
+<p class="pw-support-label">Email</p>
+<p>
+<a href="mailto:info@plotwatch.in">info@plotwatch.in</a>
+</p>
+
+<p class="pw-support-label">Phone</p>
+<p>
+<a href="tel:8884464403">8884464403</a>
+</p>
+
+</div>
+
+</div>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function(){
+
+let btn = document.querySelector(".pw-support-toggle");
+let box = document.querySelector(".pw-support-widget");
+let close = document.querySelector(".pw-support-close");
+
+btn.onclick = function(){
+box.classList.add("open");
+};
+
+close.onclick = function(){
+box.classList.remove("open");
+};
+
+});
+
+</script>
+
+<?php
+}
+
+
+add_filter('pre_get_document_title', function() {
+    return 'PlotWatch';
+});

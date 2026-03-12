@@ -38,7 +38,7 @@ class PW_Auth {
 
         if (is_wp_error($user)) {
 
-            wp_safe_redirect(home_url('/login?error=1'));
+           wp_safe_redirect(add_query_arg('error','invalid',home_url('/login')));
             exit;
 
         }
@@ -80,8 +80,6 @@ class PW_Auth {
 
         }
 
-        /* fallback */
-
         wp_safe_redirect(home_url());
         exit;
     }
@@ -107,22 +105,30 @@ class PW_Auth {
         $name   = sanitize_text_field($_POST['name'] ?? '');
         $email  = sanitize_email($_POST['email'] ?? '');
         $pass   = $_POST['password'] ?? '';
+        $confirm = $_POST['confirm_password'] ?? '';
         $mobile = sanitize_text_field($_POST['mobile'] ?? '');
 
+        /* PASSWORD MISMATCH CHECK */
+
+        if($pass !== $confirm){
+    wp_safe_redirect(add_query_arg('error','password',home_url('/register')));
+    exit;
+}
+
         if (!is_email($email)) {
-            wp_safe_redirect(home_url('/register?error=invalid'));
-            exit;
-        }
+    wp_safe_redirect(add_query_arg('error','invalid',home_url('/register')));
+    exit;
+}
 
         if (email_exists($email)) {
-            wp_safe_redirect(home_url('/register?error=email'));
-            exit;
-        }
+    wp_safe_redirect(add_query_arg('error','email',home_url('/register')));
+    exit;
+}
 
         if (!preg_match('/^[0-9]{10}$/', $mobile)) {
-            wp_safe_redirect(home_url('/register?error=mobile'));
-            exit;
-        }
+    wp_safe_redirect(add_query_arg('error','mobile',home_url('/register')));
+    exit;
+}
 
         $user_id = wp_insert_user([
             'user_login'   => $email,
@@ -154,18 +160,45 @@ class PW_Auth {
 
             $subject = "Verify Your Account - PlotWatch";
 
-            $message = "
-Hello $name,
+            $headers = ['Content-Type: text/html; charset=UTF-8'];
 
-Please verify your account:
+            $message = '
+            <html>
+            <body style="background:#f4f6f8;padding:30px;font-family:Arial">
 
-$verify_link
+            <div style="max-width:520px;margin:auto;background:#ffffff;padding:30px;border-radius:8px;text-align:center">
 
-Regards,
-PlotWatch Team
-";
+            <h2 style="color:#1e293b;margin-bottom:10px">PlotWatch</h2>
 
-            wp_mail($email, $subject, $message);
+            <h3>Verify Your Email</h3>
+
+            <p>Hello <b>'.$name.'</b>,</p>
+
+            <p>Thank you for registering. Please verify your email to activate your account.</p>
+
+            <a href="'.$verify_link.'" 
+            style="display:inline-block;background:#e31c3d;color:#fff;
+            padding:12px 22px;border-radius:6px;text-decoration:none;margin-top:10px">
+            Verify Account
+            </a>
+
+            <p style="margin-top:20px;font-size:13px;color:#666">
+            If the button does not work, copy the link below:
+            </p>
+
+            <p style="font-size:12px;color:#888">'.$verify_link.'</p>
+
+            <p style="font-size:12px;color:#888;margin-top:25px">
+            PlotWatch Security Team
+            </p>
+
+            </div>
+
+            </body>
+            </html>
+            ';
+
+            wp_mail($email, $subject, $message, $headers);
 
             wp_safe_redirect(home_url('/login?registered=1'));
             exit;
@@ -222,12 +255,6 @@ PlotWatch Team
                     '<strong>ERROR:</strong> Please verify your email before logging in.'
                 );
             }
-        }
-
-        if (in_array('operation_member', (array)$user->roles) ||
-            in_array('engineer', (array)$user->roles)) {
-
-            return $user;
         }
 
         return $user;

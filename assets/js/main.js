@@ -87,6 +87,42 @@ document.addEventListener("DOMContentLoaded", function () {
 
     });
 
+
+    /* =====================================
+       PROGRESS TOOLTIP SYSTEM
+    ===================================== */
+
+    document.querySelectorAll(".pw-progress-box").forEach(box=>{
+
+        box.addEventListener("mouseenter",function(){
+
+            let tooltip=document.createElement("div")
+
+            tooltip.className="pw-tooltip"
+            tooltip.innerText=this.dataset.title
+
+            document.body.appendChild(tooltip)
+
+            let rect=this.getBoundingClientRect()
+
+            tooltip.style.position="absolute"
+            tooltip.style.left=rect.left+"px"
+            tooltip.style.top=(rect.top-30)+"px"
+
+            this.tooltip=tooltip
+
+        })
+
+        box.addEventListener("mouseleave",function(){
+
+            if(this.tooltip){
+                this.tooltip.remove()
+            }
+
+        })
+
+    });
+
 });
 
 
@@ -157,3 +193,24 @@ window.addEventListener("load", function(){
     }
 
 });
+
+if(document.getElementById("visitChart")){
+
+new Chart(document.getElementById("visitChart"),{
+
+type:"bar",
+
+data:{
+labels:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+
+datasets:[{
+label:"Visits",
+data:window.visitChartData,
+backgroundColor:"#3b82f6"
+}]
+
+}
+
+})
+
+}
