@@ -87,41 +87,46 @@ document.addEventListener("DOMContentLoaded", function () {
 
     });
 
+});
 
-    /* =====================================
-       PROGRESS TOOLTIP SYSTEM
-    ===================================== */
 
-    document.querySelectorAll(".pw-progress-box").forEach(box=>{
+/* =====================================
+GLOBAL DASHBOARD TOOLTIP
+===================================== */
 
-        box.addEventListener("mouseenter",function(){
+let tooltip = document.createElement("div");
+tooltip.className = "pw-tooltip";
+document.body.appendChild(tooltip);
 
-            let tooltip=document.createElement("div")
+document.addEventListener("mouseover", function (e) {
 
-            tooltip.className="pw-tooltip"
-            tooltip.innerText=this.dataset.title
+    let target = e.target;
 
-            document.body.appendChild(tooltip)
+    if (target && target.dataset && target.dataset.tooltip) {
 
-            let rect=this.getBoundingClientRect()
+        tooltip.innerHTML = target.dataset.tooltip;
+        tooltip.classList.add("show");
 
-            tooltip.style.position="absolute"
-            tooltip.style.left=rect.left+"px"
-            tooltip.style.top=(rect.top-30)+"px"
+    }
 
-            this.tooltip=tooltip
+});
 
-        })
+document.addEventListener("mousemove", function (e) {
 
-        box.addEventListener("mouseleave",function(){
+    tooltip.style.left = (e.clientX + 15) + "px";
+    tooltip.style.top = (e.clientY + 15) + "px";
 
-            if(this.tooltip){
-                this.tooltip.remove()
-            }
+});
 
-        })
+document.addEventListener("mouseout", function (e) {
 
-    });
+    let target = e.target;
+
+    if (target && target.dataset && target.dataset.tooltip) {
+
+        tooltip.classList.remove("show");
+
+    }
 
 });
 
@@ -184,33 +189,122 @@ function closeModal() {
    HIDE LOADER WHEN PAGE LOADS
 ===================================== */
 
-window.addEventListener("load", function(){
+window.addEventListener("load", function () {
 
     let loader = document.getElementById("pw-loader");
 
-    if(loader){
+    if (loader) {
         loader.style.display = "none";
     }
 
 });
 
-if(document.getElementById("visitChart")){
 
-new Chart(document.getElementById("visitChart"),{
+/* =====================================
+   DONUT VISIT ANALYTICS
+===================================== */
 
-type:"bar",
+function createDonut(id, value, color) {
 
-data:{
-labels:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+    let el = document.getElementById(id);
 
-datasets:[{
-label:"Visits",
-data:window.visitChartData,
-backgroundColor:"#3b82f6"
-}]
+    if (!el) return;
+
+    new Chart(el, {
+
+        type: 'doughnut',
+
+        data: {
+            datasets: [{
+                data: [value, Math.max(1, value)],
+                backgroundColor: [color, "#e5e7eb"],
+                borderWidth: 0
+            }]
+        },
+
+        options: {
+            cutout: "70%",
+            responsive: true,
+            maintainAspectRatio: false,
+
+            plugins: {
+                legend: { display: false },
+
+                tooltip: {
+                    enabled: true,
+                    callbacks: {
+                        label: function (context) {
+
+                            let label = context.chart.canvas.id.replace("Chart", "");
+                            label = label.charAt(0).toUpperCase() + label.slice(1);
+
+                            return label + " : " + context.raw;
+
+                        }
+                    }
+                }
+            }
+        },
+
+        plugins: [{
+
+            id: 'centerText',
+
+            afterDraw(chart) {
+
+                let ctx = chart.ctx;
+                let width = chart.width;
+                let height = chart.height;
+
+                ctx.save();
+
+                let fontSize = (height / 110).toFixed(2);
+
+                ctx.font = fontSize + "em sans-serif";
+                ctx.textBaseline = "middle";
+
+                let text = value;
+                let textX = Math.round((width - ctx.measureText(text).width) / 2);
+                let textY = height / 2;
+
+                ctx.fillStyle = "#333";
+                ctx.fillText(text, textX, textY);
+
+                ctx.restore();
+
+            }
+
+        }]
+
+    });
 
 }
 
-})
+
+/* =====================================
+   FILTER MODAL
+===================================== */
+
+function openFilter() {
+
+    let f = document.getElementById("pwFilterModal");
+
+    if (!f) return;
+
+    if (f.style.display === "block") {
+        f.style.display = "none";
+    } else {
+        f.style.display = "block";
+    }
 
 }
+
+window.addEventListener("click", function (e) {
+
+    let modal = document.getElementById("pwFilterModal");
+
+    if (modal && e.target === modal) {
+        modal.style.display = "none";
+    }
+
+});

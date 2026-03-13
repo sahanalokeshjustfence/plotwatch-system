@@ -5,6 +5,10 @@ global $wpdb;
 
 $user_id = get_current_user_id();
 $table = $wpdb->prefix . 'pw_properties';
+$property_filter = isset($_GET['property']) ? intval($_GET['property']) : '';
+$start_filter = isset($_GET['start']) ? $_GET['start'] : '';
+$end_filter = isset($_GET['end']) ? $_GET['end'] : '';
+$active_filter = isset($_GET['active']) ? $_GET['active'] : '';
 
 /* ===============================
    PROPERTY DROPDOWN
@@ -86,10 +90,16 @@ $wpdb->prepare(
 FROM {$wpdb->prefix}pw_visits v
 JOIN $table p ON p.id=v.property_id
 WHERE p.user_id=%d
+AND (%d=0 OR p.id=%d)
+AND (%s='' OR v.visit_date>=%s)
+AND (%s='' OR v.visit_date<=%s)
 AND v.visit_date>=CURDATE()
 ORDER BY v.visit_date ASC
 LIMIT 5",
-$user_id
+$user_id,
+$property_filter,$property_filter,
+$start_filter,$start_filter,
+$end_filter,$end_filter
 )
 );
 
@@ -126,12 +136,17 @@ $user_id
 );
 
 /* ===============================
-   MONTHLY VISIT GRAPH
+   MONTHLY VISIT DONUT
 ================================ */
 
 $chart_data = $wpdb->get_results(
 $wpdb->prepare(
-"SELECT MONTH(visit_date) m, COUNT(*) c
+"SELECT 
+MONTH(visit_date) m,
+SUM(CASE WHEN visit_status='Scheduled' THEN 1 ELSE 0 END) scheduled,
+SUM(CASE WHEN visit_status='Completed' THEN 1 ELSE 0 END) completed,
+SUM(CASE WHEN visit_status='Missed' THEN 1 ELSE 0 END) missed,
+SUM(CASE WHEN visit_status='Scheduled' AND visit_date < CURDATE() THEN 1 ELSE 0 END) overdue
 FROM {$wpdb->prefix}pw_visits v
 JOIN $table p ON p.id=v.property_id
 WHERE p.user_id=%d
@@ -145,92 +160,174 @@ $user_id
 
 <!-- FILTER BAR -->
 
-<div class="pw-filter-wrapper">
+<div class="pw-filter-bar">
+<button class="pw-filter-btn" onclick="openFilter()">⚲ Filter</button>
+</div>
 
-<form class="pw-filter-bar">
+<!-- FILTER MODAL -->
+<div id="pwFilterModal" class="pw-filter-modal">
+<div class="pw-filter-box">
+<h3>Filter Options</h3>
 
+<form method="get">
+
+<label>Property</label>
 <select name="property">
-
-<option value="">Property Name / ID</option>
+<option value="">Select...</option>
 
 <?php foreach($property_dropdown as $prop): ?>
 
-<option value="<?php echo $prop->id ?>">
-<?php echo $prop->property_name ?> (<?php echo $prop->id ?>)
+<option value="<?php echo $prop->id ?>" 
+<?php if($property_filter==$prop->id) echo 'selected'; ?>>
+
+<?php echo $prop->property_name ?> 
+(PW<?php echo str_pad($prop->id,4,"0",STR_PAD_LEFT); ?>)
+
 </option>
 
 <?php endforeach; ?>
 
 </select>
 
-<input type="date" name="start">
-<input type="date" name="end">
+<label>Start Date</label>
+<input type="date" name="start" value="<?php echo $start_filter ?>">
 
-<select name="active">
-<option value="">Active Subscription</option>
-<option value="yes">Yes</option>
-<option value="no">No</option>
-</select>
+<label>End Date</label>
+<input type="date" name="end" value="<?php echo $end_filter ?>">
 
-<button type="submit">Apply</button>
+<label>Active Subscription</label>
 
-</form>
+<div class="pw-radio">
+
+<label><input type="radio" name="active" value="yes"
+<?php if($active_filter=='yes') echo 'checked'; ?>> Yes</label>
+
+<label><input type="radio" name="active" value="no"
+<?php if($active_filter=='no') echo 'checked'; ?>> No</label>
 
 </div>
 
+<div class="pw-filter-actions">
 
+<a href="<?php echo home_url('/customer-dashboard'); ?>" class="pw-reset">
+Reset
+</a>
+
+<button type="submit" class="pw-apply">
+Apply
+</button>
+
+</div>
+
+</form>
+</div>
+</div>
 
 <!-- SUMMARY CARDS -->
 
 <div class="pw-stats-grid">
 
-<div class="pw-stat-card blue">
+<div class="pw-stat-card blue" data-tooltip="Total properties created">
 <div class="pw-stat-number"><?php echo $total_properties ?></div>
 <div class="pw-stat-label">Total Properties</div>
 </div>
 
-<div class="pw-stat-card green">
+<div class="pw-stat-card green" data-tooltip="Currently active subscriptions">
 <div class="pw-stat-number"><?php echo $active_subscriptions ?></div>
 <div class="pw-stat-label">Active Subscriptions</div>
 </div>
 
-<div class="pw-stat-card orange">
+<div class="pw-stat-card orange" data-tooltip="Scheduled upcoming visits">
 <div class="pw-stat-number"><?php echo $upcoming_visits ?></div>
 <div class="pw-stat-label">Upcoming Visits</div>
 </div>
 
-<div class="pw-stat-card purple">
+<div class="pw-stat-card purple" data-tooltip="Total completed visits">
 <div class="pw-stat-number"><?php echo $completed_visits ?></div>
 <div class="pw-stat-label">Completed Visits</div>
 </div>
 
+<div class="pw-stat-card pink" data-tooltip="Next scheduled property visit">
+<div class="pw-stat-number">
+<?php echo $next_visit ? date('d M',strtotime($next_visit->visit_date)) : '--'; ?>
+</div>
+<div class="pw-stat-label">Next Visit</div>
 </div>
 
+<div class="pw-stat-card red" data-tooltip="Subscriptions expiring soon">
+<div class="pw-stat-number">
+<?php echo count($expiry); ?>
+</div>
+<div class="pw-stat-label">Expiring Soon</div>
+</div>
 
+</div>
 
-<!-- VISIT GRAPH -->
+<!-- VISIT ANALYTICS + UPCOMING VISITS -->
 
-<div class="pw-dash-box">
+<div class="pw-dashboard-grid">
+
+<!-- VISIT ANALYTICS -->
+
+<div class="pw-dash-box pw-analytics-box">
 
 <h3>Visit Analytics</h3>
 
-<canvas id="visitChart"></canvas>
+<div class="pw-donut-grid">
 
-<script>
+<div class="pw-donut-card">
+<canvas id="scheduledChart"></canvas>
+<div class="pw-donut-title">Scheduled</div>
+</div>
 
-window.visitChartData = [0,0,0,0,0,0,0,0,0,0,0,0];
+<div class="pw-donut-card">
+<canvas id="completedChart"></canvas>
+<div class="pw-donut-title">Completed</div>
+</div>
 
-<?php foreach($chart_data as $d): ?>
-window.visitChartData[<?php echo $d->m-1 ?>] = <?php echo $d->c ?>;
-<?php endforeach; ?>
+<div class="pw-donut-card">
+<canvas id="missedChart"></canvas>
+<div class="pw-donut-title">Missed</div>
+</div>
 
-</script>
+<div class="pw-donut-card">
+<canvas id="overdueChart"></canvas>
+<div class="pw-donut-title">Overdue</div>
+</div>
 
 </div>
 
+</div>
 
+<!-- UPCOMING VISITS -->
 
-<div class="pw-dashboard-grid">
+<div class="pw-dash-box">
+
+<h3>Upcoming Visits</h3>
+
+<div class="pw-visit-list-modern">
+
+<?php foreach($visits as $v): ?>
+
+<div class="pw-visit-item" data-tooltip="Upcoming property visit">
+
+<div class="pw-visit-left">
+<?php echo date('d M Y', strtotime($v->visit_date)); ?>
+</div>
+
+<div class="pw-visit-right">
+<?php echo esc_html($v->property_name); ?>
+</div>
+
+</div>
+
+<?php endforeach; ?>
+
+</div>
+
+</div>
+
+</div>
 
 <!-- PROPERTY PROGRESS -->
 
@@ -267,51 +364,37 @@ $p->id
 <?php echo esc_html($p->property_name); ?>
 </div>
 
-<div class="pw-box-progress">
+<div class="pw-timeline">
 
-<div class="pw-progress-box green" data-title="Property Created"></div>
+<div class="pw-step green" data-tooltip="Property Created">
+<span>Created</span>
+</div>
 
 <?php if($subscription): ?>
-<div class="pw-progress-box green" data-title="Package Assigned"></div>
+
+<div class="pw-step green" data-tooltip="Package Assigned">
+<span>Package</span>
+</div>
+
 <?php endif; ?>
 
 <?php
 
-$max_visits=0;
-
-if($subscription){
-
-if($subscription->package_type=="Monthly") $max_visits=12;
-if($subscription->package_type=="Quarterly") $max_visits=4;
-if($subscription->package_type=="Yearly") $max_visits=1;
-
-}
-
-$index=0;
+$step=1;
 
 foreach($property_visits as $visit){
 
 $class="gray";
-$title="Pending Visit";
 
-if($visit->visit_status=="Scheduled"){
-$class="purple";
-$title="Visit Scheduled ".$visit->visit_date;
-}
+if($visit->visit_status=="Scheduled") $class="purple";
+if($visit->visit_status=="Completed") $class="green";
 
-if($visit->visit_status=="Completed"){
-$class="green";
-$title="Visit Completed ".$visit->visit_date;
-}
+echo '<div class="pw-step '.$class.'" data-tooltip="'.$visit->visit_status.'">
+<span>Visit '.$step.'</span>
+</div>';
 
-echo '<div class="pw-progress-box '.$class.'" data-title="'.$title.'"></div>';
+$step++;
 
-$index++;
-
-}
-
-for($i=$index;$i<$max_visits;$i++){
-echo '<div class="pw-progress-box gray" data-title="Pending Visit"></div>';
 }
 
 ?>
@@ -324,79 +407,34 @@ echo '<div class="pw-progress-box gray" data-title="Pending Visit"></div>';
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="<?php echo PW_URL ?>assets/js/main.js"></script>
 
+<script>
 
-<!-- UPCOMING VISITS -->
+let scheduledTotal = 0;
+let completedTotal = 0;
+let missedTotal = 0;
+let overdueTotal = 0;
 
-<div class="pw-dash-box">
+<?php foreach($chart_data as $d): ?>
 
-<h3>Upcoming Visits</h3>
-
-<ul class="pw-visit-list">
-
-<?php foreach($visits as $v): ?>
-
-<li>
-<span><?php echo date('d M Y', strtotime($v->visit_date)); ?></span>
-<span><?php echo esc_html($v->property_name); ?></span>
-</li>
-
-<?php endforeach; ?>
-
-</ul>
-
-</div>
-
-
-
-<!-- NEXT VISIT -->
-
-<div class="pw-dash-box">
-
-<h3>Next Visit</h3>
-
-<?php if($next_visit): ?>
-
-<div class="pw-next-card">
-
-<div class="pw-next-date">
-<?php echo date('d M Y', strtotime($next_visit->visit_date)); ?>
-</div>
-
-<div class="pw-next-property">
-<?php echo esc_html($next_visit->property_name); ?>
-</div>
-
-</div>
-
-<?php endif; ?>
-
-</div>
-
-
-
-<!-- SUBSCRIPTION EXPIRY -->
-
-<div class="pw-dash-box">
-
-<h3>Subscription Expiring Soon</h3>
-
-<ul>
-
-<?php foreach($expiry as $e): ?>
-
-<li>
-<?php echo esc_html($e->property_name) ?>
--
-<?php echo date('d M Y',strtotime($e->end_date)) ?>
-</li>
+scheduledTotal += <?php echo $d->scheduled ?>;
+completedTotal += <?php echo $d->completed ?>;
+missedTotal += <?php echo $d->missed ?>;
+overdueTotal += <?php echo $d->overdue ?>;
 
 <?php endforeach; ?>
 
-</ul>
+document.addEventListener("DOMContentLoaded",function(){
 
-</div>
+createDonut("scheduledChart",scheduledTotal,"#3b82f6");
+createDonut("completedChart",completedTotal,"#22c55e");
+createDonut("missedChart",missedTotal,"#f59e0b");
+createDonut("overdueChart",overdueTotal,"#ef4444");
 
-</div>
+});
+
+</script>
 
 </div>

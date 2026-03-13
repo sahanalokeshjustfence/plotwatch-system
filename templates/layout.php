@@ -91,13 +91,9 @@ class="<?php echo (is_page('engineer-dashboard') && empty($tab)) ? 'active' : ''
 Dashboard
 </a>
 
-<a href="<?php echo esc_url(home_url('/engineer-dashboard')); ?>">
-Assigned Properties
-</a>
-
-<a href="<?php echo esc_url(home_url('/engineer-dashboard?tab=completed')); ?>"
-class="<?php echo ($tab === 'completed') ? 'active' : ''; ?>">
-Completed Visits
+<a href="<?php echo esc_url(home_url('/engineer-dashboard?tab=visits')); ?>"
+class="<?php echo ($tab === 'visits') ? 'active' : ''; ?>">
+Property Visits
 </a>
 
 <?php endif; ?>
@@ -165,11 +161,25 @@ include PW_PATH . 'templates/profile.php';
 }
 
 if (is_page('operation-dashboard') || $slug === 'operation-dashboard') {
+
+if(empty($tab)){
+include PW_PATH . 'templates/operation-dashboard-home.php';
+}
+elseif($tab === 'new'){
 include PW_PATH . 'templates/operation-dashboard.php';
 }
 
+}
+
 if (is_page('engineer-dashboard') || $slug === 'engineer-dashboard') {
+
+if(empty($tab)){
+include PW_PATH . 'templates/engineer-dashboard-home.php';
+}
+elseif($tab === 'visits'){
 include PW_PATH . 'templates/engineer-dashboard.php';
+}
+
 }
 
 if (is_page('assign-package') || $slug === 'assign-package') {
