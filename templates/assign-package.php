@@ -9,7 +9,8 @@ if (!in_array('operation_member', (array) $user->roles)) {
 global $wpdb;
 
 $property_id = intval($_GET['property_id'] ?? 0);
-$tab = $_GET['tab'] ?? 'package';
+//$tab = $_GET['tab'] ?? 'package';
+$tab = sanitize_text_field($_GET['tab'] ?? 'package');
 $edit_mode = isset($_GET['edit']);
 
 if (!$property_id) {
@@ -73,6 +74,7 @@ $wpdb->insert(
         'status'        => 'Active'
     ]
 );
+pw_log("Package assigned to property ".$property_id." by operation member ".get_current_user_id(),"PACKAGE");
 
 $subscription_id = $wpdb->insert_id;
 
@@ -108,6 +110,10 @@ for ($i = 0; $i < $duration; $i++) {
             'visit_status'   => 'Pending'
         ]
     );
+
+    $visit_insert_id = $wpdb->insert_id;
+
+    pw_log("Auto visit created ID ".$visit_insert_id." for property ".$property_id." on ".$visit_date,"VISIT_CREATE");
 }
 
 /* ================= UPDATE PROPERTY STATUS ================= */
@@ -154,6 +160,7 @@ if (isset($_POST['assign_visit'])) {
         ],
         ['id'=>$visit_id]
     );
+    pw_log("Visit ".$visit_id." assigned to engineer ".$engineer_id." for property ".$property_id,"VISIT_ASSIGN");
     /* ================= UPDATE PROPERTY STATUS ================= */
 
 $total_visits = $wpdb->get_var(

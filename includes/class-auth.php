@@ -38,13 +38,16 @@ class PW_Auth {
 
         if (is_wp_error($user)) {
 
-           wp_safe_redirect(add_query_arg('error','invalid',home_url('/login')));
-            exit;
+pw_log("Login failed for email: ".$email,"LOGIN");
 
-        }
+wp_safe_redirect(add_query_arg('error','invalid',home_url('/login')));
+exit;
+
+}
 
         wp_set_current_user($user->ID);
         wp_set_auth_cookie($user->ID);
+        pw_log("User login success: ".$user->user_email." | Role: ".implode(',',$user->roles),"LOGIN");
 
         /*
         |--------------------------------------------------------------------------
@@ -119,11 +122,19 @@ class PW_Auth {
     wp_safe_redirect(add_query_arg('error','invalid',home_url('/register')));
     exit;
 }
+if (email_exists($email)) {
 
-        if (email_exists($email)) {
+pw_log("Registration failed: email already exists ".$email,"REGISTER");
+
+wp_safe_redirect(add_query_arg('error','email',home_url('/register')));
+exit;
+
+}
+
+        /*if (email_exists($email)) {
     wp_safe_redirect(add_query_arg('error','email',home_url('/register')));
     exit;
-}
+}*/
 
         if (!preg_match('/^[0-9]{10}$/', $mobile)) {
     wp_safe_redirect(add_query_arg('error','mobile',home_url('/register')));
@@ -139,7 +150,7 @@ class PW_Auth {
         ]);
 
         if (!is_wp_error($user_id)) {
-
+pw_log("New user registered: ".$email." | UserID: ".$user_id,"REGISTER");
             $wpdb->insert(
                 $profile_table,
                 [
@@ -221,7 +232,7 @@ class PW_Auth {
         $saved_token = get_user_meta($user_id, 'pw_verify_token', true);
 
         if ($token === $saved_token && !empty($saved_token)) {
-
+pw_log("Account verified for userID: ".$user_id,"VERIFY");
             update_user_meta($user_id, 'pw_verified', 1);
             delete_user_meta($user_id, 'pw_verify_token');
 

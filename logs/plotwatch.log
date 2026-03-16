@@ -1,0 +1,24 @@
+[2026-03-14 11:32:35] [LOGIN] User login success: siddharth.justfence@gmail.com | Role: customer
+[2026-03-14 12:22:19] [LOGIN] User login success: sahanalokeshjustfence17@gmail.com | Role: customer
+[2026-03-14 12:23:35] [LOGIN] User login success: sahanalokesh80@gmail.com | Role: operation_member
+[2026-03-14 12:24:56] [PACKAGE] Package assigned to property 10 by operation member 18
+[2026-03-14 12:24:56] [VISIT_CREATE] Auto visit created ID 9 for property 10 on 2025-02-14
+[2026-03-14 12:27:19] [VISIT_ASSIGN] Visit 9 assigned to engineer 19 for property 10
+[2026-03-14 12:28:24] [PACKAGE] Package assigned to property 8 by operation member 18
+[2026-03-14 12:28:24] [VISIT_CREATE] Auto visit created ID 10 for property 8 on 2026-03-14
+[2026-03-14 12:28:24] [VISIT_CREATE] Auto visit created ID 11 for property 8 on 2026-04-14
+[2026-03-14 12:28:24] [VISIT_CREATE] Auto visit created ID 12 for property 8 on 2026-05-14
+[2026-03-14 12:28:25] [VISIT_CREATE] Auto visit created ID 13 for property 8 on 2026-06-14
+[2026-03-14 12:28:25] [VISIT_CREATE] Auto visit created ID 14 for property 8 on 2026-07-14
+[2026-03-14 12:28:25] [VISIT_CREATE] Auto visit created ID 15 for property 8 on 2026-08-14
+[2026-03-14 12:28:25] [VISIT_CREATE] Auto visit created ID 16 for property 8 on 2026-09-14
+[2026-03-14 12:28:25] [VISIT_CREATE] Auto visit created ID 17 for property 8 on 2026-10-14
+[2026-03-14 12:28:25] [VISIT_CREATE] Auto visit created ID 18 for property 8 on 2026-11-14
+[2026-03-14 12:28:25] [VISIT_CREATE] Auto visit created ID 19 for property 8 on 2026-12-14
+[2026-03-14 12:28:25] [VISIT_CREATE] Auto visit created ID 20 for property 8 on 2027-01-14
+[2026-03-14 12:28:25] [VISIT_CREATE] Auto visit created ID 21 for property 8 on 2027-02-14
+[2026-03-16 12:02:12] [LOGIN] Login failed for email: sahanalokeshjustfence17@gmail.com
+[2026-03-16 12:02:31] [LOGIN] User login success: sahanalokeshjustfence17@gmail.com | Role: customer
+[2026-03-16 12:45:09] [LOGIN] User login success: sahanalokesh80@gmail.com | Role: operation_member
+[2026-03-16 12:48:33] [LOGIN] User login success: sahanalokesh70@gmail.com | Role: engineer
+[2026-03-16 15:27:02] [LOGIN] User login success: sahanalokeshjustfence17@gmail.com | Role: customer

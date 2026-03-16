@@ -318,22 +318,22 @@ if ($subscription && $subscription->start_date && $subscription->end_date) {
     $today = date('Y-m-d');
 
     if ($today >= $subscription->start_date && $today <= $subscription->end_date) {
-        $subscription_badge = 'Active Subscription';
-        $subscription_class = 'pw-sub-active';
-    } elseif ($today > $subscription->end_date) {
-        $subscription_badge = 'Subscription Expired';
-        $subscription_class = 'pw-sub-expired';
-    }
+    $subscription_badge = '● Active';
+    $subscription_class = 'pw-sub-active';
+} elseif ($today > $subscription->end_date) {
+    $subscription_badge = '● Expired';
+    $subscription_class = 'pw-sub-expired';
+}
 }
 ?>
 
 <a href="<?php echo home_url('/customer-dashboard?tab=my-properties&view=' . $prop->id); ?>" 
-class="pw-property-summary-card">
+class="pw-property-summary-card <?php echo esc_attr($subscription_class); ?>">
 
 <div class="pw-card-top">
 
 <?php if (!empty($subscription_badge)) : ?>
-<span class="pw-sub-badge <?php echo esc_attr($subscription_class); ?>">
+<span class="pw-sub-status <?php echo esc_attr($subscription_class); ?>">
 <?php echo esc_html($subscription_badge); ?>
 </span>
 <?php endif; ?>

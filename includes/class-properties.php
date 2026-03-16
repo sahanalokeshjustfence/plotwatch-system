@@ -52,7 +52,9 @@ class PW_Properties {
 
         if ($insert_id) {
 
-            $property_code = 'PW' . str_pad($insert_id, 4, '0', STR_PAD_LEFT);
+pw_log("Property created ID: ".$insert_id." by user ".get_current_user_id(),"PROPERTY");
+
+$property_code = 'PW' . str_pad($insert_id, 4, '0', STR_PAD_LEFT);
 
             $wpdb->update(
                 $table,
@@ -122,7 +124,7 @@ class PW_Properties {
             ],
             ['id' => $property_id]
         );
-
+pw_log("Property updated ID: ".$property_id." by user ".get_current_user_id(),"PROPERTY");
         wp_safe_redirect(home_url('/customer-dashboard?updated=1'));
         exit;
     }

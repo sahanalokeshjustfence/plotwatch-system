@@ -290,13 +290,10 @@ add_action('wp_footer', 'pw_global_footer');
 
 function pw_global_footer() {
 
-    if (!is_page([
-        'login','register','customer-dashboard','operation-dashboard',
-        'engineer-dashboard','assign-package','add-property',
-        'customer-profile','manage-addons'
-    ])) return;
+    if (is_admin()) return; // hide in admin panel
 
     echo '<div class="pw-footer-global">'.date('Y').' © Dextra Square Private Limited</div>';
+
 }
 
 /*
@@ -471,16 +468,7 @@ exit;
 });
 
 
-function pw_log($msg){
-
-    if(is_array($msg) || is_object($msg)){
-        $msg = print_r($msg,true);
-    }
-
-    $time = current_time('Y-m-d H:i:s');
-
-    error_log("[PLOTWATCH $time] ".$msg);
-}
+//////////////////////////////////////////
 
 add_action('template_redirect','pw_auth_redirect');
 
@@ -517,7 +505,6 @@ if(is_page(['login','register','forgot-password','reset-password'])){
 
 }
 
-///////////////////
 add_action('wp_footer','pw_support_widget');
 
 function pw_support_widget(){
@@ -586,3 +573,123 @@ box.classList.remove("open");
 add_filter('pre_get_document_title', function() {
     return 'PlotWatch';
 });
+
+
+function pw_log($message, $type = 'INFO'){
+
+    $log_dir  = PW_PATH . 'logs/';
+    $log_file = $log_dir . 'plotwatch.log';
+
+    if(!file_exists($log_dir)){
+        mkdir($log_dir,0755,true);
+    }
+
+    $time = current_time('Y-m-d H:i:s');
+
+    if(is_array($message) || is_object($message)){
+        $message = print_r($message,true);
+    }
+
+    $log = "[$time] [$type] $message" . PHP_EOL;
+
+    file_put_contents($log_file,$log,FILE_APPEND);
+
+}
+
+add_action('init',function(){
+
+set_error_handler(function($errno,$errstr,$errfile,$errline){
+
+pw_log("PHP ERROR: $errstr | File: $errfile | Line: $errline","ERROR");
+
+});
+
+});
+
+/* ====================================
+FATAL ERROR LOGGER
+==================================== */
+
+register_shutdown_function(function(){
+
+    $error = error_get_last();
+
+    if($error && $error['type'] === E_ERROR){
+
+        pw_log(
+            "FATAL ERROR: ".$error['message'].
+            " | File: ".$error['file'].
+            " | Line: ".$error['line']
+        );
+
+    }
+
+});
+
+
+/* ====================================
+DATABASE ERROR LOGGER
+==================================== */
+
+add_action('shutdown',function(){
+
+    global $wpdb;
+
+    if(!empty($wpdb->last_error)){
+        pw_log("DB ERROR: ".$wpdb->last_error);
+    }
+
+});
+
+add_action('wp_footer','pw_tawk_chat');
+
+function pw_tawk_chat(){
+
+if(!is_user_logged_in()){
+
+$name = '';
+$email = '';
+$role = '';
+
+}else{
+
+$user = wp_get_current_user();
+$name = $user->display_name;
+$email = $user->user_email;
+$role = implode(",", $user->roles);
+
+}
+?>
+
+<script>
+
+var Tawk_API = Tawk_API || {};
+
+Tawk_API.onLoad = function(){
+
+Tawk_API.setAttributes({
+
+'name' : '<?php echo esc_js($name); ?>',
+'email' : '<?php echo esc_js($email); ?>',
+'role' : '<?php echo esc_js($role); ?>'
+
+}, function(error){});
+
+};
+
+</script>
+
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/69abd6378210ea1c360146a5/1jj3jpipb';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+
+<?php
+}

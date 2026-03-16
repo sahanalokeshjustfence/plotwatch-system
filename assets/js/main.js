@@ -24,9 +24,9 @@ document.addEventListener("DOMContentLoaded", function () {
        UNIVERSAL LOADER SYSTEM
     ================================= */
 
-    function showLoader() {
+    let loader = document.getElementById("pw-loader");
 
-        let loader = document.getElementById("pw-loader");
+    function showLoader() {
 
         if (loader) {
             loader.style.display = "flex";
@@ -36,15 +36,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function hideLoader() {
 
-        setTimeout(function () {
-
-            let loader = document.getElementById("pw-loader");
-
-            if (loader) {
-                loader.style.display = "none";
-            }
-
-        }, 500);
+        if (loader) {
+            loader.style.display = "none";
+        }
 
     }
 
@@ -75,12 +69,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.querySelectorAll("a").forEach(function (link) {
 
-        link.addEventListener("click", function () {
+        link.addEventListener("click", function (e) {
 
             let href = link.getAttribute("href");
 
-            if (href && !href.startsWith("#") && !href.startsWith("javascript")) {
+            if (
+                href &&
+                !href.startsWith("#") &&
+                !href.startsWith("javascript") &&
+                !link.classList.contains("no-loader")
+            ) {
+
                 showLoader();
+
             }
 
         });
@@ -308,3 +309,6 @@ window.addEventListener("click", function (e) {
     }
 
 });
+
+loader.classList.add("show");
+loader.classList.remove("show");
