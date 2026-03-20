@@ -24,22 +24,18 @@ document.addEventListener("DOMContentLoaded", function () {
        UNIVERSAL LOADER SYSTEM
     ================================= */
 
-    let loader = document.getElementById("pw-loader");
-
     function showLoader() {
-
+        let loader = document.getElementById("pw-loader");
         if (loader) {
-            loader.style.display = "flex";
+            loader.classList.add("show");
         }
-
     }
 
     function hideLoader() {
-
+        let loader = document.getElementById("pw-loader");
         if (loader) {
-            loader.style.display = "none";
+            loader.classList.remove("show");
         }
-
     }
 
     /* ===============================
@@ -64,126 +60,145 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     /* ===============================
-       PAGE LINK LOADER
+       PAGE LINK LOADER (FIXED)
     ================================= */
 
     document.querySelectorAll("a").forEach(function (link) {
 
-        link.addEventListener("click", function (e) {
+        link.addEventListener("click", function () {
 
             let href = link.getAttribute("href");
 
+            // ❌ SKIP sidebar links
+            if (link.closest(".pw-sidebar")) return;
+
+            // ❌ SKIP special links
             if (
-                href &&
-                !href.startsWith("#") &&
-                !href.startsWith("javascript") &&
-                !link.classList.contains("no-loader")
+                !href ||
+                href.startsWith("#") ||
+                href.startsWith("javascript") ||
+                href.includes("tel:") ||
+                href.includes("mailto:")
             ) {
-
-                showLoader();
-
+                return;
             }
+
+            // ✅ ONLY for real navigation
+            showLoader();
+
+            // 🔥 SAFETY AUTO HIDE
+            setTimeout(function () {
+                hideLoader();
+            }, 1500);
 
         });
 
     });
 
-});
+    /* =====================================
+       GLOBAL DASHBOARD TOOLTIP
+    ===================================== */
 
+    let tooltip = document.createElement("div");
+    tooltip.className = "pw-tooltip";
+    document.body.appendChild(tooltip);
 
-/* =====================================
-GLOBAL DASHBOARD TOOLTIP
-===================================== */
+    document.addEventListener("mouseover", function (e) {
 
-let tooltip = document.createElement("div");
-tooltip.className = "pw-tooltip";
-document.body.appendChild(tooltip);
+        let target = e.target;
 
-document.addEventListener("mouseover", function (e) {
+        if (target && target.dataset && target.dataset.tooltip) {
 
-    let target = e.target;
+            tooltip.innerHTML = target.dataset.tooltip;
+            tooltip.classList.add("show");
 
-    if (target && target.dataset && target.dataset.tooltip) {
+        }
 
-        tooltip.innerHTML = target.dataset.tooltip;
-        tooltip.classList.add("show");
+    });
+
+    document.addEventListener("mousemove", function (e) {
+
+        tooltip.style.left = (e.clientX + 15) + "px";
+        tooltip.style.top = (e.clientY + 15) + "px";
+
+    });
+
+    document.addEventListener("mouseout", function (e) {
+
+        let target = e.target;
+
+        if (target && target.dataset && target.dataset.tooltip) {
+
+            tooltip.classList.remove("show");
+
+        }
+
+    });
+
+    /* =====================================
+       PASSWORD TOGGLE
+    ===================================== */
+
+    window.pwTogglePassword = function () {
+
+        var x = document.getElementById("pw_password");
+
+        if (x) {
+            x.type = x.type === "password" ? "text" : "password";
+        }
 
     }
 
-});
+    window.pwTogglePasswordRegister = function () {
 
-document.addEventListener("mousemove", function (e) {
+        var x = document.getElementById("pw_reg_password");
 
-    tooltip.style.left = (e.clientX + 15) + "px";
-    tooltip.style.top = (e.clientY + 15) + "px";
-
-});
-
-document.addEventListener("mouseout", function (e) {
-
-    let target = e.target;
-
-    if (target && target.dataset && target.dataset.tooltip) {
-
-        tooltip.classList.remove("show");
+        if (x) {
+            x.type = x.type === "password" ? "text" : "password";
+        }
 
     }
 
+    /* =====================================
+       GLOBAL MODAL SYSTEM
+    ===================================== */
+
+    window.openModal = function (content) {
+
+        var modal = document.getElementById("pwModal");
+        var modalContent = document.getElementById("pwModalContent");
+
+        if (!modal || !modalContent) return;
+
+        modalContent.innerHTML = content;
+        modal.style.display = "flex";
+
+    }
+
+    window.closeModal = function () {
+
+        var modal = document.getElementById("pwModal");
+        var modalContent = document.getElementById("pwModalContent");
+
+        if (!modal || !modalContent) return;
+
+        modal.style.display = "none";
+        modalContent.innerHTML = "";
+
+    }
+
+    /* =====================================
+       FORCE FIX (ANTI BLOCK)
+    ===================================== */
+
+    setInterval(function () {
+        let loader = document.getElementById("pw-loader");
+        if (loader && !loader.classList.contains("show")) {
+            loader.style.display = "none";
+        }
+    }, 1000);
+
 });
-
-
-/* =====================================
-   PASSWORD TOGGLE
-===================================== */
-
-function pwTogglePassword() {
-
-    var x = document.getElementById("pw_password");
-
-    if (x) {
-        x.type = x.type === "password" ? "text" : "password";
-    }
-
-}
-
-function pwTogglePasswordRegister() {
-
-    var x = document.getElementById("pw_reg_password");
-
-    if (x) {
-        x.type = x.type === "password" ? "text" : "password";
-    }
-
-}
-
-
-/* =====================================
-   GLOBAL MODAL SYSTEM
-===================================== */
-
-function openModal(content) {
-
-    var modal = document.getElementById("pwModal");
-    var modalContent = document.getElementById("pwModalContent");
-
-    if (!modal || !modalContent) return;
-
-    modalContent.innerHTML = content;
-    modal.style.display = "flex";
-
-}
-
-function closeModal() {
-
-    var modal = document.getElementById("pwModal");
-    var modalContent = document.getElementById("pwModalContent");
-
-    if (!modal || !modalContent) return;
-
-    modal.style.display = "none";
-    modalContent.innerHTML = "";
-
-}
 
 
 /* =====================================
@@ -195,6 +210,7 @@ window.addEventListener("load", function () {
     let loader = document.getElementById("pw-loader");
 
     if (loader) {
+        loader.classList.remove("show");
         loader.style.display = "none";
     }
 
@@ -217,7 +233,7 @@ function createDonut(id, value, color) {
 
         data: {
             datasets: [{
-                data: [value, Math.max(1, value)],
+                data: [value, Math.max(1, 10 - value)],
                 backgroundColor: [color, "#e5e7eb"],
                 borderWidth: 0
             }]
@@ -226,7 +242,8 @@ function createDonut(id, value, color) {
         options: {
             cutout: "70%",
             responsive: true,
-            maintainAspectRatio: false,
+            maintainAspectRatio: true,
+            aspectRatio: 1,
 
             plugins: {
                 legend: { display: false },
@@ -309,6 +326,3 @@ window.addEventListener("click", function (e) {
     }
 
 });
-
-loader.classList.add("show");
-loader.classList.remove("show");

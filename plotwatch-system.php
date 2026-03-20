@@ -8,6 +8,7 @@ Author: PlotWatch
 
 if (!defined('ABSPATH')) exit;
 
+define('PW_RECAPTCHA_SECRET', '6Ld2y48sAAAAAHjcXW0WAEnJijzZTM4CR5T_SeVk');
 /*
 |--------------------------------------------------------------------------
 | CONSTANTS

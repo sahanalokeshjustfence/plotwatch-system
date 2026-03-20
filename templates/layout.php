@@ -13,7 +13,18 @@ $user  = wp_get_current_user();
 $roles = (array) $user->roles;
 $role  = !empty($roles) ? $roles[0] : '';
 
-$tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : '';
+$tab = '';
+
+if(isset($_GET['tab'])){
+    $tab = sanitize_text_field($_GET['tab']);
+} else {
+    // fallback (important for server)
+    $query_string = $_SERVER['QUERY_STRING'] ?? '';
+    parse_str($query_string, $params);
+    if(isset($params['tab'])){
+        $tab = sanitize_text_field($params['tab']);
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -36,11 +47,9 @@ $tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : '';
 </div>
 
 <div class="pw-sidebar-toggle" onclick="toggleSidebar()">
-
 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
 <path d="M9 6L15 12L9 18" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
-
 </div>
 
 <nav>
@@ -153,77 +162,81 @@ Logout
 
 <?php
 
-global $post;
-
-$slug = '';
-if ($post && isset($post->post_name)) {
-    $slug = $post->post_name;
-}
+$slug = get_query_var('pagename');
 
 if (!$slug) {
-    $uri = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
-    $parts = explode('/', $uri);
-    $slug = end($parts);
+    $slug = basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
 }
 
-if (is_page('customer-dashboard') || $slug === 'customer-dashboard') {
+/* ROUTING */
 
-if(empty($tab)){
-include PW_PATH . 'templates/customer-dashboard-home.php';
-}else{
-include PW_PATH . 'templates/dashboard.php';
-}
+switch ($slug) {
 
-}
+case 'customer-dashboard':
 
-if (is_page('add-property') || $slug === 'add-property') {
-include PW_PATH . 'templates/add-property.php';
-}
+    if(empty($tab)){
+        include PW_PATH . 'templates/customer-dashboard-home.php';
+    } else {
+        include PW_PATH . 'templates/dashboard.php';
+    }
 
-if (is_page('customer-profile') || $slug === 'customer-profile') {
-include PW_PATH . 'templates/profile.php';
-}
+break;
 
-if (is_page('operation-dashboard') || $slug === 'operation-dashboard') {
 
-if(empty($tab)){
-include PW_PATH . 'templates/operation-dashboard-home.php';
-}
-elseif($tab === 'new'){
-include PW_PATH . 'templates/operation-dashboard.php';
-}
+case 'add-property':
+    include PW_PATH . 'templates/add-property.php';
+break;
 
-}
 
-if (is_page('engineer-dashboard') || $slug === 'engineer-dashboard') {
+case 'customer-profile':
+    include PW_PATH . 'templates/profile.php';
+break;
 
-if(empty($tab)){
-include PW_PATH . 'templates/engineer-dashboard-home.php';
-}
-elseif($tab === 'visits'){
-include PW_PATH . 'templates/engineer-dashboard.php';
-}
 
-}
+case 'operation-dashboard':
 
-if (is_page('assign-package') || $slug === 'assign-package') {
-include PW_PATH . 'templates/assign-package.php';
-}
+    if(empty($tab)){
+        include PW_PATH . 'templates/operation-dashboard-home.php';
+    }
+    elseif($tab === 'new'){
+        include PW_PATH . 'templates/operation-dashboard.php';
+    }
 
-if (is_page('update-visit') || $slug === 'update-visit') {
-include PW_PATH . 'templates/update-visit.php';
-}
+break;
 
-if (is_page('visit-details') || $slug === 'visit-details') {
-include PW_PATH . 'templates/visit-details.php';
-}
 
-if (is_page('visit-reports') || $slug === 'visit-reports') {
-include PW_PATH . 'templates/visit-reports.php';
-}
+case 'engineer-dashboard':
 
-if (is_page('manage-addons') || $slug === 'manage-addons') {
-include PW_PATH . 'templates/manage-addons.php';
+    if(empty($tab)){
+        include PW_PATH . 'templates/engineer-dashboard-home.php';
+    }
+    elseif(trim($tab) === 'visits'){
+        include PW_PATH . 'templates/engineer-dashboard.php';
+    }
+
+break;
+
+
+case 'assign-package':
+    include PW_PATH . 'templates/assign-package.php';
+break;
+
+case 'update-visit':
+    include PW_PATH . 'templates/update-visit.php';
+break;
+
+case 'visit-details':
+    include PW_PATH . 'templates/visit-details.php';
+break;
+
+case 'visit-reports':
+    include PW_PATH . 'templates/visit-reports.php';
+break;
+
+case 'manage-addons':
+    include PW_PATH . 'templates/manage-addons.php';
+break;
+
 }
 
 ?>
@@ -277,3 +290,4 @@ sidebar.classList.remove("open");
 
 </body>
 </html>
+

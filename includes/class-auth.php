@@ -14,6 +14,19 @@ class PW_Auth {
 
         add_filter('authenticate', [$this, 'block_unverified'], 30, 3);
     }
+    
+    // 🤖 CAPTCHA TRIGGER LOGIC
+    public function should_show_captcha($email) {
+        $ip = $_SERVER['REMOTE_ADDR'];
+
+        $email_key = 'pw_login_email_' . md5($email);
+        $ip_key    = 'pw_login_ip_' . md5($ip);
+
+        $email_attempts = get_transient($email_key) ?: 0;
+        $ip_attempts    = get_transient($ip_key) ?: 0;
+
+        return ($email_attempts >= 3 || $ip_attempts >= 5);
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -28,6 +41,34 @@ class PW_Auth {
         $email = sanitize_email($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
 
+        // ✅ STEP 1: CHECK LOGIN ATTEMPTS
+        $this->check_login_attempts($email);
+
+        // 🤖 CAPTCHA VALIDATION
+        if ($this->should_show_captcha($email)) {
+
+            $recaptcha = $_POST['g-recaptcha-response'] ?? '';
+
+            if (empty($recaptcha)) {
+                wp_safe_redirect(add_query_arg('error','captcha',home_url('/login')));
+                exit;
+            }
+
+            $response = wp_remote_post("https://www.google.com/recaptcha/api/siteverify", [
+                'body' => [
+                    'secret' => PW_RECAPTCHA_SECRET,
+                    'response' => $recaptcha
+                ]
+            ]);
+
+            $result = json_decode(wp_remote_retrieve_body($response));
+
+            if (!$result->success) {
+                wp_safe_redirect(add_query_arg('error','captcha',home_url('/login')));
+                exit;
+            }
+        }
+
         $creds = [
             'user_login'    => $email,
             'user_password' => $password,
@@ -38,15 +79,21 @@ class PW_Auth {
 
         if (is_wp_error($user)) {
 
-pw_log("Login failed for email: ".$email,"LOGIN");
+            // ❌ STEP 2: RECORD FAILED ATTEMPT
+            $this->record_failed_attempt($email);
 
-wp_safe_redirect(add_query_arg('error','invalid',home_url('/login')));
-exit;
+            pw_log("Login failed for email: ".$email,"LOGIN");
 
-}
+            wp_safe_redirect(add_query_arg('error','invalid',home_url('/login')));
+            exit;
+        }
+
+        // ✅ STEP 3: CLEAR FAILED ATTEMPTS
+        $this->clear_login_attempts($email);
 
         wp_set_current_user($user->ID);
         wp_set_auth_cookie($user->ID);
+
         pw_log("User login success: ".$user->user_email." | Role: ".implode(',',$user->roles),"LOGIN");
 
         /*
@@ -56,31 +103,23 @@ exit;
         */
 
         if (in_array('customer', (array) $user->roles)) {
-
             wp_safe_redirect(home_url('/customer-dashboard'));
             exit;
-
         }
 
         if (in_array('operation_member', (array) $user->roles)) {
-
             wp_safe_redirect(home_url('/operation-dashboard'));
             exit;
-
         }
 
         if (in_array('engineer', (array) $user->roles)) {
-
             wp_safe_redirect(home_url('/engineer-dashboard'));
             exit;
-
         }
 
         if (in_array('administrator', (array) $user->roles)) {
-
             wp_safe_redirect(admin_url());
             exit;
-
         }
 
         wp_safe_redirect(home_url());
@@ -111,35 +150,26 @@ exit;
         $confirm = $_POST['confirm_password'] ?? '';
         $mobile = sanitize_text_field($_POST['mobile'] ?? '');
 
-        /* PASSWORD MISMATCH CHECK */
-
         if($pass !== $confirm){
-    wp_safe_redirect(add_query_arg('error','password',home_url('/register')));
-    exit;
-}
+            wp_safe_redirect(add_query_arg('error','password',home_url('/register')));
+            exit;
+        }
 
         if (!is_email($email)) {
-    wp_safe_redirect(add_query_arg('error','invalid',home_url('/register')));
-    exit;
-}
-if (email_exists($email)) {
+            wp_safe_redirect(add_query_arg('error','invalid',home_url('/register')));
+            exit;
+        }
 
-pw_log("Registration failed: email already exists ".$email,"REGISTER");
-
-wp_safe_redirect(add_query_arg('error','email',home_url('/register')));
-exit;
-
-}
-
-        /*if (email_exists($email)) {
-    wp_safe_redirect(add_query_arg('error','email',home_url('/register')));
-    exit;
-}*/
+        if (email_exists($email)) {
+            pw_log("Registration failed: email already exists ".$email,"REGISTER");
+            wp_safe_redirect(add_query_arg('error','email',home_url('/register')));
+            exit;
+        }
 
         if (!preg_match('/^[0-9]{10}$/', $mobile)) {
-    wp_safe_redirect(add_query_arg('error','mobile',home_url('/register')));
-    exit;
-}
+            wp_safe_redirect(add_query_arg('error','mobile',home_url('/register')));
+            exit;
+        }
 
         $user_id = wp_insert_user([
             'user_login'   => $email,
@@ -150,7 +180,9 @@ exit;
         ]);
 
         if (!is_wp_error($user_id)) {
-pw_log("New user registered: ".$email." | UserID: ".$user_id,"REGISTER");
+
+            pw_log("New user registered: ".$email." | UserID: ".$user_id,"REGISTER");
+
             $wpdb->insert(
                 $profile_table,
                 [
@@ -169,47 +201,7 @@ pw_log("New user registered: ".$email." | UserID: ".$user_id,"REGISTER");
 
             $verify_link = home_url('/?pw_verify=1&uid=' . $user_id . '&token=' . $token);
 
-            $subject = "Verify Your Account - PlotWatch";
-
-            $headers = ['Content-Type: text/html; charset=UTF-8'];
-
-            $message = '
-            <html>
-            <body style="background:#f4f6f8;padding:30px;font-family:Arial">
-
-            <div style="max-width:520px;margin:auto;background:#ffffff;padding:30px;border-radius:8px;text-align:center">
-
-            <h2 style="color:#1e293b;margin-bottom:10px">PlotWatch</h2>
-
-            <h3>Verify Your Email</h3>
-
-            <p>Hello <b>'.$name.'</b>,</p>
-
-            <p>Thank you for registering. Please verify your email to activate your account.</p>
-
-            <a href="'.$verify_link.'" 
-            style="display:inline-block;background:#e31c3d;color:#fff;
-            padding:12px 22px;border-radius:6px;text-decoration:none;margin-top:10px">
-            Verify Account
-            </a>
-
-            <p style="margin-top:20px;font-size:13px;color:#666">
-            If the button does not work, copy the link below:
-            </p>
-
-            <p style="font-size:12px;color:#888">'.$verify_link.'</p>
-
-            <p style="font-size:12px;color:#888;margin-top:25px">
-            PlotWatch Security Team
-            </p>
-
-            </div>
-
-            </body>
-            </html>
-            ';
-
-            wp_mail($email, $subject, $message, $headers);
+            wp_mail($email, "Verify Your Account - PlotWatch", "Click: ".$verify_link);
 
             wp_safe_redirect(home_url('/login?registered=1'));
             exit;
@@ -232,7 +224,7 @@ pw_log("New user registered: ".$email." | UserID: ".$user_id,"REGISTER");
         $saved_token = get_user_meta($user_id, 'pw_verify_token', true);
 
         if ($token === $saved_token && !empty($saved_token)) {
-pw_log("Account verified for userID: ".$user_id,"VERIFY");
+            pw_log("Account verified for userID: ".$user_id,"VERIFY");
             update_user_meta($user_id, 'pw_verified', 1);
             delete_user_meta($user_id, 'pw_verify_token');
 
@@ -299,6 +291,50 @@ pw_log("Account verified for userID: ".$user_id,"VERIFY");
         include PW_PATH . 'templates/register.php';
         return ob_get_clean();
     }
+
+    /* =====================================================
+       🔥 ADDED FUNCTIONS (FIX FOR ERROR)
+    ===================================================== */
+
+    private function check_login_attempts($email) {
+
+        $ip = $_SERVER['REMOTE_ADDR'];
+
+        $email_key = 'pw_login_email_' . md5($email);
+        $ip_key    = 'pw_login_ip_' . md5($ip);
+
+        $email_attempts = get_transient($email_key) ?: 0;
+        $ip_attempts    = get_transient($ip_key) ?: 0;
+
+        if ($email_attempts >= 5 || $ip_attempts >= 10) {
+
+            wp_safe_redirect(add_query_arg('error','blocked',home_url('/login')));
+            exit;
+        }
+    }
+
+    private function record_failed_attempt($email) {
+
+        $ip = $_SERVER['REMOTE_ADDR'];
+
+        $email_key = 'pw_login_email_' . md5($email);
+        $ip_key    = 'pw_login_ip_' . md5($ip);
+
+        $email_attempts = get_transient($email_key) ?: 0;
+        $ip_attempts    = get_transient($ip_key) ?: 0;
+
+        set_transient($email_key, $email_attempts + 1, 900);
+        set_transient($ip_key, $ip_attempts + 1, 900);
+    }
+
+    private function clear_login_attempts($email) {
+
+        $ip = $_SERVER['REMOTE_ADDR'];
+
+        delete_transient('pw_login_email_' . md5($email));
+        delete_transient('pw_login_ip_' . md5($ip));
+    }
+
 }
 
 new PW_Auth();

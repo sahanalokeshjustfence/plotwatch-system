@@ -114,7 +114,7 @@ Property ID : <?php echo esc_html($visit->property_code); ?>
 <label>Engineer Comments</label>
 
 <p>
-<?php echo nl2br(esc_html($visit->notes)); ?>
+<?php echo nl2br(esc_html($visit->visit_comment)); ?>
 </p>
 
 </div>

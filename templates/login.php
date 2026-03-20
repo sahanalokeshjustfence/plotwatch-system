@@ -16,6 +16,12 @@ break;
 case 'not_verified':
 $error = "Please verify your email before logging in.";
 break;
+case 'captcha':
+$error = "Please complete captcha verification.";
+break;
+case 'blocked':
+$error = "Too many login attempts. Try again after 15 minutes.";
+break;
 
 default:
 $error = "Login failed. Please try again.";
@@ -58,6 +64,16 @@ required>
 <span class="pw-eye" onclick="toggleLoginPass()">👁</span>
 
 </div>
+<?php
+$email = isset($_POST['email']) ? sanitize_email($_POST['email']) : ($_GET['email'] ?? '');
+$auth = isset($GLOBALS['pw_auth']) ? $GLOBALS['pw_auth'] : new PW_Auth();
+
+if (!empty($email) && $auth->should_show_captcha($email)) :
+?>
+    <div class="g-recaptcha" data-sitekey="6Ld2y48sAAAAAAVEeIjTjIy8a26zU8Nzd-7Y9EBQ"></div>
+<?php endif; ?>
+
+
 
 <div class="pw-forgot">
 <a href="<?php echo esc_url(home_url('/forgot-password')); ?>">
@@ -81,12 +97,12 @@ Register
 </div>
 
 </div>
-
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <?php if($error_code == 'invalid'): ?>
 <script>
-window.addEventListener('load', function() {
+document.addEventListener('DOMContentLoaded', function() {
 
 Swal.fire({
 icon:'error',

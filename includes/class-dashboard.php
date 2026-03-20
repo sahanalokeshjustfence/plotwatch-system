@@ -45,7 +45,7 @@ class PW_Dashboard {
             'visit-reports'
         ];
 
-        if (in_array($slug, $pages)) {
+       if (is_page($pages) || in_array($slug, $pages)) {
             return PW_PATH . 'templates/layout.php';
         }
 

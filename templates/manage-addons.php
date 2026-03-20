@@ -1,4 +1,6 @@
+
 <?php
+
 if (!is_user_logged_in()) return;
 
 $user = wp_get_current_user();
@@ -15,37 +17,54 @@ $table = $wpdb->prefix . 'pw_addons';
 if (isset($_GET['delete'])) {
     $delete_id = intval($_GET['delete']);
     $wpdb->delete($table, ['id' => $delete_id]);
-    echo "<div class='pw-success-box'>Add-on Deleted Successfully</div>";
-}
 
-/* ================= SAVE / UPDATE ================= */
-
-if (isset($_POST['pw_save_addon'])) {
-
-    $name    = sanitize_text_field($_POST['addon_name']);
-    $desc    = sanitize_textarea_field($_POST['addon_description']);
-    $edit_id = intval($_POST['edit_id']);
-
-    if ($edit_id > 0) {
-
-        $wpdb->update($table, [
-            'name' => $name,
-            'description' => $desc
-        ], ['id' => $edit_id]);
-
-        echo "<div class='pw-success-box'>Add-on Updated Successfully</div>";
-
+    if($wpdb->last_error){
+        echo "<pre>Delete Error: ".$wpdb->last_error."</pre>";
     } else {
-
-        $wpdb->insert($table, [
-            'name' => $name,
-            'description' => $desc
-        ]);
-
-        echo "<div class='pw-success-box'>Add-on Added Successfully</div>";
+        echo "<div class='pw-success-box'>Add-on Deleted Successfully</div>";
     }
 }
 
+/* ================= SAVE / UPDATE ================= */
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['addon_name'])) {
+
+    // ✅ NONCE CHECK (important for server)
+    if (!isset($_POST['_wpnonce']) || !wp_verify_nonce($_POST['_wpnonce'], 'save_addon_nonce')) {
+        echo "<pre>Security check failed</pre>";
+    } else {
+
+        $name    = sanitize_text_field($_POST['addon_name']);
+        $desc    = sanitize_textarea_field($_POST['addon_description']);
+        $edit_id = intval($_POST['edit_id']);
+
+        if ($edit_id > 0) {
+
+            $wpdb->update($table, [
+                'name' => $name,
+                'description' => $desc
+            ], ['id' => $edit_id]);
+
+            if($wpdb->last_error){
+                echo "<pre>Update Error: ".$wpdb->last_error."</pre>";
+            } else {
+                echo "<div class='pw-success-box'>Add-on Updated Successfully</div>";
+            }
+
+        } else {
+
+            $wpdb->insert($table, [
+                'name' => $name,
+                'description' => $desc
+            ]);
+
+            if($wpdb->last_error){
+                echo "<pre>Insert Error: ".$wpdb->last_error."</pre>";
+            } else {
+                echo "<div class='pw-success-box'>Add-on Added Successfully</div>";
+            }
+        }
+    }
+}
 /* ================= SEARCH ================= */
 
 $search = isset($_GET['search']) ? sanitize_text_field($_GET['search']) : '';
@@ -144,7 +163,7 @@ Delete
 </tbody>
 </table>
 
-<!-- PAGINATION (WP CORRECT VERSION) -->
+<!-- PAGINATION -->
 <?php if ($total_pages > 1): ?>
 <div class="pw-manage-pagination">
 <?php for ($i=1; $i <= $total_pages; $i++): ?>
@@ -164,7 +183,9 @@ Delete
 
 <h3 id="modalTitle">Add Add-on</h3>
 
-<form method="post">
+<form method="post" action="">
+
+<?php wp_nonce_field('save_addon_nonce'); ?> <!-- ✅ ADDED -->
 
 <input type="hidden" name="edit_id" id="edit_id" value="0">
 
@@ -179,8 +200,10 @@ Delete
           placeholder="Description"></textarea>
 
 <div style="margin-top:15px;">
+
 <button type="submit"
         name="pw_save_addon"
+        value="1"
         class="pw-btn-red">
 Save
 </button>

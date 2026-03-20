@@ -22,3 +22,74 @@
 [2026-03-16 12:45:09] [LOGIN] User login success: sahanalokesh80@gmail.com | Role: operation_member
 [2026-03-16 12:48:33] [LOGIN] User login success: sahanalokesh70@gmail.com | Role: engineer
 [2026-03-16 15:27:02] [LOGIN] User login success: sahanalokeshjustfence17@gmail.com | Role: customer
+[2026-03-17 11:33:45] [LOGIN] User login success: sahanalokesh70@gmail.com | Role: engineer
+[2026-03-17 13:36:53] [LOGIN] User login success: sahanalokesh70@gmail.com | Role: engineer
+[2026-03-17 13:37:20] [LOGIN] User login success: sahanalokesh80@gmail.com | Role: operation_member
+[2026-03-17 15:39:04] [LOGIN] User login success: sahanalokesh80@gmail.com | Role: operation_member
+[2026-03-19 16:12:09] [INFO] FATAL ERROR: Uncaught Error: Call to undefined method PW_Auth::check_login_attempts() in C:\xampp\htdocs\plotwatch\wp-content\plugins\plotwatch-system\includes\class-auth.php:45
+Stack trace:
+#0 C:\xampp\htdocs\plotwatch\wp-includes\class-wp-hook.php(341): PW_Auth->handle_login('')
+#1 C:\xampp\htdocs\plotwatch\wp-includes\class-wp-hook.php(365): WP_Hook->apply_filters(NULL, Array)
+#2 C:\xampp\htdocs\plotwatch\wp-includes\plugin.php(522): WP_Hook->do_action(Array)
+#3 C:\xampp\htdocs\plotwatch\wp-settings.php(742): do_action('init')
+#4 C:\xampp\htdocs\plotwatch\wp-config.php(113): require_once('C:\\xampp\\htdocs...')
+#5 C:\xampp\htdocs\plotwatch\wp-load.php(50): require_once('C:\\xampp\\htdocs...')
+#6 C:\xampp\htdocs\plotwatch\wp-blog-header.php(13): require_once('C:\\xampp\\htdocs...')
+#7 C:\xampp\htdocs\plotwatch\index.php(17): require('C:\\xampp\\htdocs...')
+#8 {main}
+  thrown | File: C:\xampp\htdocs\plotwatch\wp-content\plugins\plotwatch-system\includes\class-auth.php | Line: 45
+[2026-03-19 16:12:21] [INFO] FATAL ERROR: Uncaught Error: Call to undefined method PW_Auth::check_login_attempts() in C:\xampp\htdocs\plotwatch\wp-content\plugins\plotwatch-system\includes\class-auth.php:45
+Stack trace:
+#0 C:\xampp\htdocs\plotwatch\wp-includes\class-wp-hook.php(341): PW_Auth->handle_login('')
+#1 C:\xampp\htdocs\plotwatch\wp-includes\class-wp-hook.php(365): WP_Hook->apply_filters(NULL, Array)
+#2 C:\xampp\htdocs\plotwatch\wp-includes\plugin.php(522): WP_Hook->do_action(Array)
+#3 C:\xampp\htdocs\plotwatch\wp-settings.php(742): do_action('init')
+#4 C:\xampp\htdocs\plotwatch\wp-config.php(113): require_once('C:\\xampp\\htdocs...')
+#5 C:\xampp\htdocs\plotwatch\wp-load.php(50): require_once('C:\\xampp\\htdocs...')
+#6 C:\xampp\htdocs\plotwatch\wp-blog-header.php(13): require_once('C:\\xampp\\htdocs...')
+#7 C:\xampp\htdocs\plotwatch\index.php(17): require('C:\\xampp\\htdocs...')
+#8 {main}
+  thrown | File: C:\xampp\htdocs\plotwatch\wp-content\plugins\plotwatch-system\includes\class-auth.php | Line: 45
+[2026-03-19 16:12:34] [INFO] FATAL ERROR: Uncaught Error: Call to undefined method PW_Auth::check_login_attempts() in C:\xampp\htdocs\plotwatch\wp-content\plugins\plotwatch-system\includes\class-auth.php:45
+Stack trace:
+#0 C:\xampp\htdocs\plotwatch\wp-includes\class-wp-hook.php(341): PW_Auth->handle_login('')
+#1 C:\xampp\htdocs\plotwatch\wp-includes\class-wp-hook.php(365): WP_Hook->apply_filters(NULL, Array)
+#2 C:\xampp\htdocs\plotwatch\wp-includes\plugin.php(522): WP_Hook->do_action(Array)
+#3 C:\xampp\htdocs\plotwatch\wp-settings.php(742): do_action('init')
+#4 C:\xampp\htdocs\plotwatch\wp-config.php(113): require_once('C:\\xampp\\htdocs...')
+#5 C:\xampp\htdocs\plotwatch\wp-load.php(50): require_once('C:\\xampp\\htdocs...')
+#6 C:\xampp\htdocs\plotwatch\wp-blog-header.php(13): require_once('C:\\xampp\\htdocs...')
+#7 C:\xampp\htdocs\plotwatch\index.php(17): require('C:\\xampp\\htdocs...')
+#8 {main}
+  thrown | File: C:\xampp\htdocs\plotwatch\wp-content\plugins\plotwatch-system\includes\class-auth.php | Line: 45
+[2026-03-19 16:12:42] [INFO] FATAL ERROR: Uncaught Error: Call to undefined method PW_Auth::check_login_attempts() in C:\xampp\htdocs\plotwatch\wp-content\plugins\plotwatch-system\includes\class-auth.php:45
+Stack trace:
+#0 C:\xampp\htdocs\plotwatch\wp-includes\class-wp-hook.php(341): PW_Auth->handle_login('')
+#1 C:\xampp\htdocs\plotwatch\wp-includes\class-wp-hook.php(365): WP_Hook->apply_filters(NULL, Array)
+#2 C:\xampp\htdocs\plotwatch\wp-includes\plugin.php(522): WP_Hook->do_action(Array)
+#3 C:\xampp\htdocs\plotwatch\wp-settings.php(742): do_action('init')
+#4 C:\xampp\htdocs\plotwatch\wp-config.php(113): require_once('C:\\xampp\\htdocs...')
+#5 C:\xampp\htdocs\plotwatch\wp-load.php(50): require_once('C:\\xampp\\htdocs...')
+#6 C:\xampp\htdocs\plotwatch\wp-blog-header.php(13): require_once('C:\\xampp\\htdocs...')
+#7 C:\xampp\htdocs\plotwatch\index.php(17): require('C:\\xampp\\htdocs...')
+#8 {main}
+  thrown | File: C:\xampp\htdocs\plotwatch\wp-content\plugins\plotwatch-system\includes\class-auth.php | Line: 45
+[2026-03-19 16:13:07] [INFO] FATAL ERROR: Uncaught Error: Call to undefined method PW_Auth::check_login_attempts() in C:\xampp\htdocs\plotwatch\wp-content\plugins\plotwatch-system\includes\class-auth.php:45
+Stack trace:
+#0 C:\xampp\htdocs\plotwatch\wp-includes\class-wp-hook.php(341): PW_Auth->handle_login('')
+#1 C:\xampp\htdocs\plotwatch\wp-includes\class-wp-hook.php(365): WP_Hook->apply_filters(NULL, Array)
+#2 C:\xampp\htdocs\plotwatch\wp-includes\plugin.php(522): WP_Hook->do_action(Array)
+#3 C:\xampp\htdocs\plotwatch\wp-settings.php(742): do_action('init')
+#4 C:\xampp\htdocs\plotwatch\wp-config.php(113): require_once('C:\\xampp\\htdocs...')
+#5 C:\xampp\htdocs\plotwatch\wp-load.php(50): require_once('C:\\xampp\\htdocs...')
+#6 C:\xampp\htdocs\plotwatch\wp-blog-header.php(13): require_once('C:\\xampp\\htdocs...')
+#7 C:\xampp\htdocs\plotwatch\index.php(17): require('C:\\xampp\\htdocs...')
+#8 {main}
+  thrown | File: C:\xampp\htdocs\plotwatch\wp-content\plugins\plotwatch-system\includes\class-auth.php | Line: 45
+[2026-03-19 16:26:36] [LOGIN] Login failed for email: sahanalokeshjustfence17@gmail.com
+[2026-03-19 16:27:01] [LOGIN] User login success: sahanalokeshjustfence17@gmail.com | Role: customer
+[2026-03-19 16:27:41] [LOGIN] Login failed for email: sahanalokeshjustfence17@gmail.com
+[2026-03-19 16:27:52] [LOGIN] Login failed for email: 
+[2026-03-19 16:28:01] [LOGIN] Login failed for email: sahanalokeshjustfence17@gmail.com
+[2026-03-19 16:28:13] [LOGIN] Login failed for email: sahanalokeshjustfence17@gmail.com
+[2026-03-19 17:54:33] [LOGIN] User login success: sahanalokeshjustfence17@gmail.com | Role: customer
