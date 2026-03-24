@@ -197,14 +197,16 @@ $user_id
 
 <label>Active Subscription</label>
 
-<div class="pw-radio">
+<div class="pw-radio-group">
+    <label>
+        <input type="radio" name="active_subscription" value="yes">
+        Yes
+    </label>
 
-<label><input type="radio" name="active" value="yes"
-<?php if($active_filter=='yes') echo 'checked'; ?>> Yes</label>
-
-<label><input type="radio" name="active" value="no"
-<?php if($active_filter=='no') echo 'checked'; ?>> No</label>
-
+    <label>
+        <input type="radio" name="active_subscription" value="no">
+        No
+    </label>
 </div>
 
 <div class="pw-filter-actions">

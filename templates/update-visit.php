@@ -25,10 +25,17 @@ p.property_name,
 p.location_name,
 p.property_code,
 p.google_map,
-p.address as full_address
+p.address as full_address,
+p.contact_person,
+p.contact_number,
+p.property_type,
+p.plot_size,
+u.user_email as email
 FROM {$wpdb->prefix}pw_visits v
 LEFT JOIN {$wpdb->prefix}pw_properties p
 ON v.property_id=p.id
+LEFT JOIN {$wpdb->users} u
+ON p.user_id = u.ID
 WHERE v.id=%d",
 $visit_id
 )
@@ -58,39 +65,69 @@ $current_visit->property_id
 
 <!-- PROPERTY DETAILS -->
 
-<div class="pw-grid-3">
+<!-- PROPERTY HEADER FULL DETAILS -->
+
+<div class="pw-header-card">
+
+<h2><?php echo esc_html($current_visit->property_name); ?></h2>
+
+<div class="pw-sub-id">
+Property ID: <?php echo esc_html($current_visit->property_code); ?>
+</div>
+
+<div class="pw-header-grid">
 
 <div>
-<label>Property ID</label>
-<input type="text" value="<?php echo esc_attr($current_visit->property_code); ?>" readonly>
+<label>Contact Person</label>
+<span><?php echo esc_html($current_visit->contact_person ?? ''); ?></span>
 </div>
 
 <div>
-<label>Property Name</label>
-<input type="text" value="<?php echo esc_attr($current_visit->property_name); ?>" readonly>
+<label>Contact Number</label>
+<span><?php echo esc_html($current_visit->contact_number ?? ''); ?></span>
 </div>
 
-<div class="full">
+<div>
+<label>Email</label>
+<span><?php echo esc_html($current_visit->email ?? ''); ?></span>
+</div>
 
-<label>Full Address</label>
+<div>
+<label>Property Type</label>
+<span><?php echo esc_html($current_visit->property_type ?? ''); ?></span>
+</div>
 
-<input type="text" value="<?php echo esc_attr($current_visit->full_address); ?>" readonly>
+<div>
+<label>Plot Size</label>
+<span><?php echo esc_html($current_visit->plot_size ?? ''); ?></span>
+</div>
+
+<div>
+<label>Location</label>
+<span><?php echo esc_html($current_visit->location_name); ?></span>
+</div>
+
+<div style="grid-column: span 3;">
+<label>Address</label>
+<span><?php echo esc_html($current_visit->full_address); ?></span>
+</div>
 
 <?php if(!empty($current_visit->google_map)): ?>
-
+<div style="grid-column: span 3;">
+<label>Google Map</label>
 <a href="<?php echo esc_url($current_visit->google_map); ?>" target="_blank">
-📍 View Location
+View Location
 </a>
-
+</div>
 <?php endif; ?>
 
-</div>
-
+<!-- 🔥 NEW FIELD -->
 <div>
 <label>Visit Date</label>
-<input type="text" value="<?php echo esc_attr($current_visit->visit_date); ?>" readonly>
+<span><?php echo esc_html($current_visit->visit_date); ?></span>
 </div>
 
+</div>
 </div>
 
 <hr>

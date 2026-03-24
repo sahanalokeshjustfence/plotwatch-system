@@ -6,7 +6,7 @@ class PW_Properties {
     public function __construct() {
 
         add_action('init', [$this, 'handle_property_submission']);
-        add_action('init', [$this, 'handle_property_update']);
+        //add_action('init', [$this, 'handle_property_update']);
         add_action('init', [$this, 'handle_package_assignment']);
         add_action('init', [$this, 'handle_engineer_report']);
 
@@ -86,7 +86,7 @@ $property_code = 'PW' . str_pad($insert_id, 4, '0', STR_PAD_LEFT);
     |--------------------------------------------------------------------------
     */
 
-    public function handle_property_update() {
+    /*public function handle_property_update() {
 
         if (!isset($_POST['pw_update_property'])) return;
         if (!is_user_logged_in()) return;
@@ -127,7 +127,7 @@ $property_code = 'PW' . str_pad($insert_id, 4, '0', STR_PAD_LEFT);
 pw_log("Property updated ID: ".$property_id." by user ".get_current_user_id(),"PROPERTY");
         wp_safe_redirect(home_url('/customer-dashboard?updated=1'));
         exit;
-    }
+    }*/
 
     /*
     |--------------------------------------------------------------------------

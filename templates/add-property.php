@@ -14,21 +14,21 @@ if (!is_user_logged_in()) return;
         <!-- ROW 1 -->
         <div class="pw-grid-3">
             <div>
-                <label>Property Name *</label>
+               <label class="required">Property Name</label>
                 <input type="text" 
                        name="property_name" 
                        required>
             </div>
 
             <div>
-                <label>Location Name *</label>
+                <label class="required" >Location Name </label>
                 <input type="text" 
                        name="location_name" 
                        required>
             </div>
 
             <div>
-                <label>Plot Size (Ex: 1200 sqft) *</label>
+                <label class="required">Plot Size (Ex: 1200 sqft) </label>
                 <input type="text" 
                        name="plot_size" 
                        required>
@@ -38,7 +38,7 @@ if (!is_user_logged_in()) return;
         <!-- ROW 2 -->
         <div class="pw-grid-3">
             <div>
-                <label>Property Type *</label>
+                <label class="required">Property Type </label>
                 <select name="property_type" required>
                     <option value="">Select Property Type</option>
                     <option value="Residential">Residential</option>
@@ -49,14 +49,14 @@ if (!is_user_logged_in()) return;
             </div>
 
             <div>
-                <label>Contact Person *</label>
+                <label class="required">Contact Person </label>
                 <input type="text" 
                        name="contact_person" 
                        required>
             </div>
 
             <div>
-                <label>Contact Number *</label>
+                <label class="required">Contact Number </label>
                 <input type="text" 
                        name="contact_number" 
                        required>
@@ -66,7 +66,7 @@ if (!is_user_logged_in()) return;
         <!-- ROW 3 -->
         <div class="pw-grid-3">
             <div class="full">
-                <label>Full Address *</label>
+                <label class="required">Full Address </label>
                 <textarea name="address" required></textarea>
             </div>
         </div>
@@ -74,7 +74,7 @@ if (!is_user_logged_in()) return;
         <!-- ROW 4 -->
         <div class="pw-grid-3">
             <div>
-                <label>Google Map Pin / Coordinates *</label>
+                <label class="required">Google Map link / Coordinates </label>
                 <input type="url"
        name="google_map"
        placeholder="https://maps.google.com/..."

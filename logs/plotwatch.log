@@ -93,3 +93,78 @@ Stack trace:
 [2026-03-19 16:28:01] [LOGIN] Login failed for email: sahanalokeshjustfence17@gmail.com
 [2026-03-19 16:28:13] [LOGIN] Login failed for email: sahanalokeshjustfence17@gmail.com
 [2026-03-19 17:54:33] [LOGIN] User login success: sahanalokeshjustfence17@gmail.com | Role: customer
+[2026-03-21 10:26:24] [REGISTER] New user registered: sahanalokeshjustfence17@gmail.com | UserID: 2
+[2026-03-21 10:59:48] [INFO] FATAL ERROR: Maximum execution time of 120 seconds exceeded | File: C:\xampp\htdocs\plotwatch\wp-admin\includes\class-wp-filesystem-direct.php | Line: 82
+[2026-03-21 11:01:58] [INFO] FATAL ERROR: Maximum execution time of 120 seconds exceeded | File: C:\xampp\htdocs\plotwatch\wp-admin\includes\class-wp-filesystem-direct.php | Line: 82
+[2026-03-23 04:48:53] [REGISTER] Registration failed: email already exists sahanalokeshjustfence17@gmail.com
+[2026-03-23 04:50:50] [REGISTER] New user registered: sahanalokeshjustfence17@gmail.com | UserID: 3
+[2026-03-23 04:52:24] [VERIFY] Account verified for userID: 3
+[2026-03-23 04:52:52] [LOGIN] User login success: sahanalokeshjustfence17@gmail.com | Role: customer
+[2026-03-23 04:54:01] [PROPERTY] Property created ID: 1 by user 3
+[2026-03-23 05:47:22] [INFO] FATAL ERROR: Uncaught TypeError: call_user_func_array(): Argument #1 ($callback) must be a valid callback, class PW_Properties does not have a method "handle_property_update" in C:\xampp\htdocs\plotwatch\wp-includes\class-wp-hook.php:341
+Stack trace:
+#0 C:\xampp\htdocs\plotwatch\wp-includes\class-wp-hook.php(365): WP_Hook->apply_filters(NULL, Array)
+#1 C:\xampp\htdocs\plotwatch\wp-includes\plugin.php(522): WP_Hook->do_action(Array)
+#2 C:\xampp\htdocs\plotwatch\wp-settings.php(742): do_action('init')
+#3 C:\xampp\htdocs\plotwatch\wp-config.php(102): require_once('C:\\xampp\\htdocs...')
+#4 C:\xampp\htdocs\plotwatch\wp-load.php(50): require_once('C:\\xampp\\htdocs...')
+#5 C:\xampp\htdocs\plotwatch\wp-blog-header.php(13): require_once('C:\\xampp\\htdocs...')
+#6 C:\xampp\htdocs\plotwatch\index.php(17): require('C:\\xampp\\htdocs...')
+#7 {main}
+  thrown | File: C:\xampp\htdocs\plotwatch\wp-includes\class-wp-hook.php | Line: 341
+[2026-03-23 05:47:22] [INFO] FATAL ERROR: Uncaught TypeError: call_user_func_array(): Argument #1 ($callback) must be a valid callback, class PW_Properties does not have a method "handle_property_update" in C:\xampp\htdocs\plotwatch\wp-includes\class-wp-hook.php:341
+Stack trace:
+#0 C:\xampp\htdocs\plotwatch\wp-includes\class-wp-hook.php(365): WP_Hook->apply_filters(NULL, Array)
+#1 C:\xampp\htdocs\plotwatch\wp-includes\plugin.php(522): WP_Hook->do_action(Array)
+#2 C:\xampp\htdocs\plotwatch\wp-settings.php(742): do_action('init')
+#3 C:\xampp\htdocs\plotwatch\wp-config.php(102): require_once('C:\\xampp\\htdocs...')
+#4 C:\xampp\htdocs\plotwatch\wp-load.php(50): require_once('C:\\xampp\\htdocs...')
+#5 C:\xampp\htdocs\plotwatch\wp-cron.php(46): require_once('C:\\xampp\\htdocs...')
+#6 {main}
+  thrown | File: C:\xampp\htdocs\plotwatch\wp-includes\class-wp-hook.php | Line: 341
+[2026-03-23 06:15:16] [ERROR] PHP ERROR: Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\plotwatch\wp-includes\class-wp-styles.php:208) | File: C:\xampp\htdocs\plotwatch\wp-includes\pluggable.php | Line: 1531
+[2026-03-23 06:15:16] [ERROR] PHP ERROR: Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\plotwatch\wp-includes\class-wp-styles.php:208) | File: C:\xampp\htdocs\plotwatch\wp-includes\pluggable.php | Line: 1534
+[2026-03-23 06:15:57] [ERROR] PHP ERROR: Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\plotwatch\wp-includes\class-wp-styles.php:208) | File: C:\xampp\htdocs\plotwatch\wp-includes\pluggable.php | Line: 1531
+[2026-03-23 06:15:57] [ERROR] PHP ERROR: Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\plotwatch\wp-includes\class-wp-styles.php:208) | File: C:\xampp\htdocs\plotwatch\wp-includes\pluggable.php | Line: 1534
+[2026-03-23 06:32:24] [ERROR] PHP ERROR: Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\plotwatch\wp-includes\class-wp-styles.php:208) | File: C:\xampp\htdocs\plotwatch\wp-includes\pluggable.php | Line: 1531
+[2026-03-23 06:32:24] [ERROR] PHP ERROR: Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\plotwatch\wp-includes\class-wp-styles.php:208) | File: C:\xampp\htdocs\plotwatch\wp-includes\pluggable.php | Line: 1534
+[2026-03-23 06:32:53] [ERROR] PHP ERROR: Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\plotwatch\wp-includes\class-wp-styles.php:208) | File: C:\xampp\htdocs\plotwatch\wp-includes\pluggable.php | Line: 1531
+[2026-03-23 06:32:53] [ERROR] PHP ERROR: Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\plotwatch\wp-includes\class-wp-styles.php:208) | File: C:\xampp\htdocs\plotwatch\wp-includes\pluggable.php | Line: 1534
+[2026-03-23 06:38:22] [ERROR] PHP ERROR: Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\plotwatch\wp-includes\class-wp-styles.php:208) | File: C:\xampp\htdocs\plotwatch\wp-includes\pluggable.php | Line: 1531
+[2026-03-23 06:38:22] [ERROR] PHP ERROR: Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\plotwatch\wp-includes\class-wp-styles.php:208) | File: C:\xampp\htdocs\plotwatch\wp-includes\pluggable.php | Line: 1534
+[2026-03-23 06:39:27] [ERROR] PHP ERROR: Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\plotwatch\wp-includes\class-wp-styles.php:208) | File: C:\xampp\htdocs\plotwatch\wp-includes\pluggable.php | Line: 1531
+[2026-03-23 06:39:27] [ERROR] PHP ERROR: Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\plotwatch\wp-includes\class-wp-styles.php:208) | File: C:\xampp\htdocs\plotwatch\wp-includes\pluggable.php | Line: 1534
+[2026-03-23 06:43:10] [ERROR] PHP ERROR: Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\plotwatch\wp-includes\class-wp-styles.php:208) | File: C:\xampp\htdocs\plotwatch\wp-includes\pluggable.php | Line: 1531
+[2026-03-23 06:43:10] [ERROR] PHP ERROR: Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\plotwatch\wp-includes\class-wp-styles.php:208) | File: C:\xampp\htdocs\plotwatch\wp-includes\pluggable.php | Line: 1534
+[2026-03-23 06:47:35] [ERROR] PHP ERROR: Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\plotwatch\wp-includes\class-wp-styles.php:208) | File: C:\xampp\htdocs\plotwatch\wp-includes\pluggable.php | Line: 1531
+[2026-03-23 06:47:35] [ERROR] PHP ERROR: Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\plotwatch\wp-includes\class-wp-styles.php:208) | File: C:\xampp\htdocs\plotwatch\wp-includes\pluggable.php | Line: 1534
+[2026-03-23 06:50:24] [ERROR] PHP ERROR: Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\plotwatch\wp-includes\class-wp-styles.php:208) | File: C:\xampp\htdocs\plotwatch\wp-includes\pluggable.php | Line: 1531
+[2026-03-23 06:50:24] [ERROR] PHP ERROR: Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\plotwatch\wp-includes\class-wp-styles.php:208) | File: C:\xampp\htdocs\plotwatch\wp-includes\pluggable.php | Line: 1534
+[2026-03-23 07:00:19] [ERROR] PHP ERROR: Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\plotwatch\wp-includes\class-wp-styles.php:208) | File: C:\xampp\htdocs\plotwatch\wp-includes\pluggable.php | Line: 1531
+[2026-03-23 07:00:19] [ERROR] PHP ERROR: Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\plotwatch\wp-includes\class-wp-styles.php:208) | File: C:\xampp\htdocs\plotwatch\wp-includes\pluggable.php | Line: 1534
+[2026-03-23 07:05:15] [ERROR] PHP ERROR: Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\plotwatch\wp-includes\class-wp-styles.php:208) | File: C:\xampp\htdocs\plotwatch\wp-includes\pluggable.php | Line: 1531
+[2026-03-23 07:05:15] [ERROR] PHP ERROR: Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\plotwatch\wp-includes\class-wp-styles.php:208) | File: C:\xampp\htdocs\plotwatch\wp-includes\pluggable.php | Line: 1534
+[2026-03-23 07:06:03] [ERROR] PHP ERROR: Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\plotwatch\wp-includes\class-wp-styles.php:208) | File: C:\xampp\htdocs\plotwatch\wp-includes\pluggable.php | Line: 1531
+[2026-03-23 07:06:03] [ERROR] PHP ERROR: Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\plotwatch\wp-includes\class-wp-styles.php:208) | File: C:\xampp\htdocs\plotwatch\wp-includes\pluggable.php | Line: 1534
+[2026-03-23 07:08:22] [ERROR] PHP ERROR: Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\plotwatch\wp-includes\class-wp-styles.php:208) | File: C:\xampp\htdocs\plotwatch\wp-includes\pluggable.php | Line: 1531
+[2026-03-23 07:08:22] [ERROR] PHP ERROR: Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\plotwatch\wp-includes\class-wp-styles.php:208) | File: C:\xampp\htdocs\plotwatch\wp-includes\pluggable.php | Line: 1534
+[2026-03-23 07:08:48] [ERROR] PHP ERROR: Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\plotwatch\wp-includes\class-wp-styles.php:208) | File: C:\xampp\htdocs\plotwatch\wp-includes\pluggable.php | Line: 1531
+[2026-03-23 07:08:48] [ERROR] PHP ERROR: Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\plotwatch\wp-includes\class-wp-styles.php:208) | File: C:\xampp\htdocs\plotwatch\wp-includes\pluggable.php | Line: 1534
+[2026-03-23 07:12:14] [ERROR] PHP ERROR: Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\plotwatch\wp-includes\class-wp-styles.php:208) | File: C:\xampp\htdocs\plotwatch\wp-includes\pluggable.php | Line: 1531
+[2026-03-23 07:12:14] [ERROR] PHP ERROR: Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\plotwatch\wp-includes\class-wp-styles.php:208) | File: C:\xampp\htdocs\plotwatch\wp-includes\pluggable.php | Line: 1534
+[2026-03-23 07:19:05] [ERROR] PHP ERROR: Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\plotwatch\wp-includes\class-wp-styles.php:208) | File: C:\xampp\htdocs\plotwatch\wp-includes\pluggable.php | Line: 1531
+[2026-03-23 07:19:05] [ERROR] PHP ERROR: Cannot modify header information - headers already sent by (output started at C:\xampp\htdocs\plotwatch\wp-includes\class-wp-styles.php:208) | File: C:\xampp\htdocs\plotwatch\wp-includes\pluggable.php | Line: 1534
+[2026-03-23 10:12:04] [ERROR] PHP ERROR: Attempt to read property "ID" on string | File: C:\xampp\htdocs\plotwatch\wp-content\plugins\plotwatch-system\plotwatch-system.php | Line: 317
+[2026-03-23 10:13:46] [ERROR] PHP ERROR: Attempt to read property "ID" on string | File: C:\xampp\htdocs\plotwatch\wp-content\plugins\plotwatch-system\plotwatch-system.php | Line: 317
+[2026-03-23 10:15:34] [LOGIN] User login success: sahanalokesh80@gmail.com | Role: operation_member
+[2026-03-24 11:06:39] [LOGIN] User login success: sahanalokeshjustfence17@gmail.com | Role: customer
+[2026-03-24 11:07:26] [PROPERTY] Property created ID: 2 by user 3
+[2026-03-24 11:16:46] [PROPERTY] Property created ID: 3 by user 3
+[2026-03-24 11:24:35] [ERROR] PHP ERROR: Constant WP_DEBUG already defined | File: C:\xampp\htdocs\plotwatch\wp-config.php | Line: 104
+[2026-03-24 11:24:35] [ERROR] PHP ERROR: Constant WP_DEBUG_LOG already defined | File: C:\xampp\htdocs\plotwatch\wp-config.php | Line: 105
+[2026-03-24 11:24:35] [ERROR] PHP ERROR: Constant WP_DEBUG_DISPLAY already defined | File: C:\xampp\htdocs\plotwatch\wp-config.php | Line: 106
+[2026-03-24 11:24:36] [ERROR] PHP ERROR: Constant WP_DEBUG already defined | File: C:\xampp\htdocs\plotwatch\wp-config.php | Line: 104
+[2026-03-24 11:24:36] [ERROR] PHP ERROR: Constant WP_DEBUG_LOG already defined | File: C:\xampp\htdocs\plotwatch\wp-config.php | Line: 105
+[2026-03-24 11:24:36] [ERROR] PHP ERROR: Constant WP_DEBUG_DISPLAY already defined | File: C:\xampp\htdocs\plotwatch\wp-config.php | Line: 106
+[2026-03-24 11:27:57] [PROPERTY] Property created ID: 4 by user 3
+[2026-03-24 11:34:46] [PROPERTY] Property created ID: 5 by user 3

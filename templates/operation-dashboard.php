@@ -34,11 +34,7 @@ $offset   = ($page - 1) * $per_page;
 
 $where = " WHERE 1=1 ";
 
-if ($tab === 'new') {
-$heading = "New Properties";
-}else{
-$heading = "All Properties";
-}
+$heading = "Properties";
 
 /* SEARCH */
 
@@ -229,7 +225,7 @@ Reset
 <thead>
 
 <tr>
-<th>#</th>
+<th>Sl.no</th>
 <th>Property ID</th>
 <th>Customer</th>
 <th>Property</th>

@@ -133,7 +133,7 @@ $engineers = get_users([
 
 <div class="pw-dashboard">
 
-<h2>Operation Dashboard</h2>
+
 
 <!-- FILTER -->
 
@@ -287,38 +287,40 @@ Apply
 
 <h3>Engineers</h3>
 
-<table class="pw-table pw-engineer-table">
-
-<tr>
-<th>Engineer</th>
-<th>S</th>
-<th>P</th>
-<th>C</th>
-</tr>
+<div class="pw-engineer-cards">
 
 <?php foreach($engineers as $eng): ?>
 
-<tr>
+<div class="pw-engineer-card">
 
-<td><?php echo esc_html($eng->display_name); ?></td>
+<div class="pw-eng-name">
+<?php echo esc_html($eng->display_name); ?>
+</div>
 
-<td class="pw-badge blue">
-<?php echo intval($eng->scheduled); ?>
-</td>
+<div class="pw-eng-stats">
 
-<td class="pw-badge orange">
-<?php echo intval($eng->pending); ?>
-</td>
+<div class="pw-eng-box blue">
+<span>S</span>
+<b><?php echo intval($eng->scheduled); ?></b>
+</div>
 
-<td class="pw-badge green">
-<?php echo intval($eng->completed); ?>
-</td>
+<div class="pw-eng-box orange">
+<span>P</span>
+<b><?php echo intval($eng->pending); ?></b>
+</div>
 
-</tr>
+<div class="pw-eng-box green">
+<span>C</span>
+<b><?php echo intval($eng->completed); ?></b>
+</div>
+
+</div>
+
+</div>
 
 <?php endforeach; ?>
 
-</table>
+</div>
 
 </div>
 
@@ -413,3 +415,81 @@ let modal=document.getElementById("pwFilterModal");
 modal.style.display = modal.style.display === "block" ? "none" : "block";
 }
 </script>
+
+<!-- PROPERTY PROGRESS (ALL PROPERTIES) -->
+
+<div class="pw-dash-box scroll-box">
+
+<h3>Property Progress</h3>
+
+<?php
+
+$all_properties = $wpdb->get_results(
+"SELECT id, property_name FROM {$wpdb->prefix}pw_properties"
+);
+
+foreach($all_properties as $p):
+
+$subscription = $wpdb->get_row(
+$wpdb->prepare(
+"SELECT * FROM {$wpdb->prefix}pw_subscriptions
+WHERE property_id=%d
+ORDER BY id DESC LIMIT 1",
+$p->id
+)
+);
+
+$property_visits = $wpdb->get_results(
+$wpdb->prepare(
+"SELECT visit_status, visit_date
+FROM {$wpdb->prefix}pw_visits
+WHERE property_id=%d
+ORDER BY visit_date ASC",
+$p->id
+)
+);
+
+?>
+
+<div class="pw-property-progress">
+
+<div class="pw-property-title">
+<?php echo esc_html($p->property_name); ?>
+</div>
+
+<div class="pw-timeline">
+
+<div class="pw-step green">
+<span>Created</span>
+</div>
+
+<?php if($subscription): ?>
+<div class="pw-step green">
+<span>Package</span>
+</div>
+<?php endif; ?>
+
+<?php
+$step=1;
+
+foreach($property_visits as $visit){
+
+$class="gray";
+
+if($visit->visit_status=="Scheduled") $class="purple";
+if($visit->visit_status=="Completed") $class="green";
+
+echo '<div class="pw-step '.$class.'">
+<span>Visit '.$step.'</span>
+</div>';
+
+$step++;
+}
+?>
+
+</div>
+</div>
+
+<?php endforeach; ?>
+
+</div>

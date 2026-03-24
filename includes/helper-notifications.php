@@ -24,6 +24,7 @@ $data = [
 "components"=>[
 [
 "type"=>"body",
+
 "parameters"=>[
 [
 "type"=>"text",
@@ -73,12 +74,14 @@ $response = wp_remote_post($url,$args);
 if(is_wp_error($response)){
     error_log('[PLOTWATCH WHATSAPP ERROR] '.$response->get_error_message());
 }else{
-    error_log('[PLOTWATCH WHATSAPP RESPONSE] '.wp_remote_retrieve_body($response));
+    $body = wp_remote_retrieve_body($response);
+    error_log('[PLOTWATCH WHATSAPP RESPONSE] '.$body);
 }
 
 return $response;
 
 }
+
 
 function pw_send_property_email($email,$name,$property_id,$property_name,$location,$plot_size){
 
@@ -110,6 +113,7 @@ wp_mail($email,$subject,$message,$headers);
 
 }
 
+
 function pw_notify_operation_team($property){
 
 global $wpdb;
@@ -134,7 +138,8 @@ $wpdb->prepare(
 $op->ID
 )
 );
-error_log('[WHATSAPP PHONE] '.$phone);
+
+error_log('[WHATSAPP RAW PHONE] '.$phone);
 
 $email = $op->user_email;
 $name  = $op->display_name;
@@ -142,7 +147,8 @@ $name  = $op->display_name;
 /* skip if phone empty */
 
 if(empty($phone)){
-continue;
+    error_log('[WHATSAPP SKIPPED] Empty phone for user '.$op->ID);
+    continue;
 }
 
 /* remove + sign if exists */
@@ -155,7 +161,11 @@ if(strlen($phone)==10){
     $phone = '91'.$phone;
 }
 
+error_log('[WHATSAPP FINAL PHONE] '.$phone);
+
 /* send whatsapp */
+
+error_log('[WHATSAPP] Sending to '.$phone);
 
 pw_send_whatsapp_template(
 $phone,

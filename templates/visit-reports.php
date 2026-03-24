@@ -40,12 +40,11 @@ $videos = array_filter(explode(',', $visit->visit_videos ?? ''));
 
 <!-- PROPERTY HEADER -->
 
-<div class="pw-report-header">
-<h2><?php echo esc_html($visit->property_name); ?></h2>
-<p class="pw-property-id">
+<h2 class="pw-red-title"><?php echo esc_html($visit->property_name); ?></h2>
+<p class="pw-property-id pw-red-text">
 Property ID : <?php echo esc_html($visit->property_code); ?>
 </p>
-</div>
+
 
 
 <!-- GALLERY -->
@@ -120,7 +119,7 @@ Property ID : <?php echo esc_html($visit->property_code); ?>
 </div>
 <div class="pw-inspection-report">
 
-<h3>Inspection Summary</h3>
+<h3 class="pw-red-title">Inspection Summary</h3>
 
 <div class="pw-report-grid">
 

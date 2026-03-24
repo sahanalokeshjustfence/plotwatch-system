@@ -2,7 +2,42 @@
    GLOBAL FONT + RESET
 ===================================================== */
 
+
+
+/* 🔥 BLOCK THEME CSS EFFECT */
+.pw-app,
+.pw-app * {
+    font-family: 'Poppins', sans-serif !important;
+    text-transform: none !important;
+}
+
+/* FIX TABLE DAMAGE */
+.pw-app table,
+.pw-app th,
+.pw-app td {
+    border: none !important;
+    text-align: left !important;
+}
+
+.pw-app button {
+    border: none;
+    outline: none;
+    cursor: pointer;
+}
+
+/* FIX INPUT */
+.pw-app input[type="text"],
+.pw-app input[type="number"],
+.pw-app input[type="date"],
+.pw-app select,
+.pw-app textarea {
+    all: unset;
+    box-sizing: border-box;
+}
+
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+
 
 *{
     box-sizing:border-box;
@@ -17,6 +52,8 @@ body{
     font-size:14px;
     line-height:1.6;
 }
+
+
 
 
 /* =====================================================
@@ -318,24 +355,59 @@ body.pw-auth-page::after{
 }
 
 
-/* =====================================================
-   BUTTONS
-===================================================== */
+/* ===============================
+GLOBAL BUTTON STYLE (PREMIUM RED)
+=============================== */
 
-.pw-btn{
-    padding:12px 20px;
-    background:#dc2626;
+.pw-btn,
+button,
+input[type="submit"],
+.pw-small-btn,
+.pw-btn-red {
+
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    color:#fff;
     border:none;
-    color:white;
-    border-radius:8px;
+
+    padding:12px 22px;
+    border-radius:10px;
+
     font-weight:600;
+    font-size:14px;
+
     font-family:'Poppins', sans-serif;
+
     cursor:pointer;
-    transition:0.3s;
+    transition: all 0.25s ease;
+
+    box-shadow: 0 6px 16px rgba(220,38,38,0.25);
 }
 
-.pw-btn:hover{
-    background:#b91c1c;
+/* HOVER */
+.pw-btn:hover,
+button:hover,
+input[type="submit"]:hover,
+.pw-small-btn:hover,
+.pw-btn-red:hover {
+
+    background: linear-gradient(135deg, #b91c1c, #991b1b);
+
+    transform: translateY(-2px);
+
+    box-shadow: 0 10px 22px rgba(220,38,38,0.35);
+}
+
+/* CLICK EFFECT */
+.pw-btn:active,
+button:active {
+    transform: scale(0.97);
+}
+
+/* SMALL BUTTON FIX */
+.pw-small-btn{
+    padding:8px 14px;
+    font-size:12px;
+    border-radius:8px;
 }
 
 
@@ -424,7 +496,7 @@ body.pw-auth-page::after{
 
 .pw-property-summary-card{
 background:#ffffff;
-padding:22px 22px 18px;
+padding:14px 18px 14px;   /* 🔥 reduced spacing */
 border-radius:14px;
 
 border:1px solid #eef2f7;
@@ -447,8 +519,9 @@ border-color:#e5e7eb;
 
 .pw-card-top{
     display:flex;
-    justify-content:space-between;
-    margin-bottom:12px;
+    justify-content:flex-start;
+    gap:10px;
+    margin-bottom:4px;   /* 🔥 less gap */
 }
 
 .pw-property-id{
@@ -462,6 +535,29 @@ border-color:#e5e7eb;
     color:#6b7280;
 }
 
+/* CARD ONLY */
+.pw-property-summary-card{
+    position:relative;
+}
+
+.pw-property-summary-card .pw-status-badge{
+    position:absolute;
+    top:10px;
+    right:10px;
+
+    font-size:11px;
+    padding:6px 12px;
+    border-radius:20px;
+
+    z-index:2;
+}
+
+/* TABLE FIX */
+.pw-table .pw-status-badge{
+    position:static;   /* 🔥 VERY IMPORTANT */
+    font-size:12px;
+    padding:6px 14px;
+}
 /* =========================================
    PROPERTY CARD TEXT IMPROVEMENT
 ========================================= */
@@ -470,7 +566,7 @@ border-color:#e5e7eb;
 font-size:18px;
 font-weight:600;
 color:#0f172a;
-margin-top:6px;
+margin-top:0px;   /* 🔥 move up */
 margin-bottom:2px;
 }
 
@@ -2025,19 +2121,30 @@ margin-left:70px;
 /* TOGGLE BUTTON */
 
 .pw-sidebar-toggle{
-position:absolute;
-top:20px;
-right:-12px;
-background:#1e293b;
-color:white;
-width:24px;
-height:24px;
-border-radius:50%;
-display:flex;
-align-items:center;
-justify-content:center;
-cursor:pointer;
-font-size:12px;
+    position:absolute;
+    top:20px;
+    right:-14px;
+
+    background:#dc2626;
+    color:#fff;
+
+    width:30px;
+    height:30px;
+
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    cursor:pointer;
+
+    box-shadow:0 4px 12px rgba(220,38,38,0.4);
+    transition:0.2s;
+}
+
+.pw-sidebar-toggle:hover{
+    transform:scale(1.1);
+    background:#b91c1c;
 }
 
 /* MOBILE MENU */
@@ -2206,6 +2313,23 @@ box-shadow:0 6px 20px rgba(0,0,0,0.3);
 /* 🔥 CHANGE THIS */
 z-index:1000 !important;
 
+}
+
+.pw-support-widget{
+    pointer-events: none;
+}
+
+.pw-support-widget.open{
+    pointer-events: auto;
+}
+.pw-support-toggle{
+    bottom: 25px;
+    left: 20px;
+}
+
+.pw-support-widget{
+    bottom: 80px;
+    left: 20px;
 }
 
 /* PHONE ICON */
@@ -3279,11 +3403,7 @@ body.pw-auth-page::after{
     z-index:1000;
 }
 
-/* SUPPORT WIDGET */
-.pw-support-widget,
-.pw-support-toggle{
-    z-index:900 !important;
-}
+
 
 /* LOADER */
 #pw-loader{
@@ -3297,4 +3417,423 @@ body.pw-auth-page::after{
 
 .pw-support-widget.open{
     display:block;
+}
+
+.pw-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #2ecc71;
+    color: #fff;
+    padding: 14px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    z-index: 9999;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    animation: slideIn 0.5s ease, fadeOut 0.5s ease 3s forwards;
+}
+
+.pw-toast.success {
+    background: #27ae60;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+        transform: translateX(120%);
+    }
+}
+
+.pw-back-link{
+    text-decoration:none;
+    font-size:22px;        /* bigger arrow */
+    font-weight:700;       /* thicker */
+    color:#e63946;         /* RED */
+    background:none;       /* ❌ remove box */
+    padding:0;             /* ❌ remove spacing */
+    border-radius:0;       /* ❌ remove rounded */
+    transition:0.2s;
+}
+
+.pw-back-link:hover{
+    color:#c1121f;         /* darker red on hover */
+}
+.pw-property-detail-card{
+    padding-top: 10px !important;   /* reduce top space */
+}
+
+.pw-top-bar{
+    margin-top: 0 !important;       /* remove extra gap */
+}
+
+.pw-property-detail-card{
+    padding-top: 0 !important;
+}
+
+.pw-top-bar{
+    margin-top: -10px !important;
+}
+.pw-property-detail-card{
+    padding-top: 0 !important;
+}
+
+.pw-top-bar{
+    margin-top: -10px !important;
+}
+
+/* ===============================
+GLOBAL PAGE HEADINGS
+=============================== */
+
+.pw-page-title,
+.pw-property-detail-card h2,
+.pw-rectangle h2,
+.pw-profile-card h2,
+.pw-form-card h2 {
+
+    color:#dc2626;              /* RED */
+    font-weight:700;            /* BOLD */
+    font-size:28px;             /* bigger */
+    letter-spacing:0.3px;
+
+    position:relative;
+    display:inline-block;
+}
+
+/* ===============================
+CLEAN RED HEADINGS (NO LINE)
+=============================== */
+
+.pw-page-title,
+.pw-property-detail-card h2,
+.pw-rectangle h2,
+.pw-profile-card h2,
+.pw-form-card h2 {
+
+    color:#dc2626;        /* RED */
+    font-weight:700;      /* BOLD */
+    font-size:28px;       /* SIZE */
+    letter-spacing:0.3px;
+
+    margin-bottom:20px;
+  
+}
+
+
+
+/* REMOVE HEADER LINE + FIX SIZE */
+.pw-dash-box h3{
+    border-left:none;
+    padding-left:0;
+    font-size:18px;
+    font-weight:600;
+}
+
+/* ENGINEER CARDS */
+
+.pw-engineer-cards{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+gap:15px;
+}
+
+.pw-engineer-card{
+background:#fff;
+padding:18px;
+border-radius:12px;
+box-shadow:0 6px 18px rgba(0,0,0,0.06);
+transition:.2s;
+}
+
+.pw-engineer-card:hover{
+transform:translateY(-3px);
+box-shadow:0 10px 25px rgba(0,0,0,0.1);
+}
+
+.pw-eng-name{
+font-weight:700;
+margin-bottom:12px;
+color:#111;
+}
+
+.pw-eng-stats{
+display:flex;
+gap:8px;
+margin-top:10px;
+}
+
+.pw-eng-box{
+flex:1;
+padding:10px 0;
+border-radius:10px;
+text-align:center;
+color:white;
+font-size:12px;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+}
+
+.pw-eng-box span{
+font-size:11px;
+opacity:.8;
+margin-bottom:2px;
+}
+
+.pw-eng-box b{
+font-size:15px;
+}
+/* PROPERTY PROGRESS IMPROVE */
+
+.pw-property-progress{
+background:#f9fafb;
+padding:15px 18px;
+border-radius:10px;
+margin-bottom:15px;
+border:1px solid #eef2f7;
+}
+
+.pw-property-title{
+font-size:14px;
+font-weight:600;
+margin-bottom:10px;
+color:#111827;
+}
+
+.pw-timeline{
+gap:8px;
+}
+
+.pw-step{
+font-size:11px;
+padding:6px 12px;
+border-radius:20px;
+}
+
+/* hover effect */
+.pw-property-progress:hover{
+background:#ffffff;
+box-shadow:0 6px 18px rgba(0,0,0,0.06);
+}
+.pw-dashboard .pw-dash-box{
+margin-bottom:20px;
+}
+/*layout symbol*/
+
+.pw-icon{
+    font-size:18px;
+    min-width:20px;
+    text-align:center;
+
+    filter: brightness(0) invert(1); /* 🔥 makes icons white */
+}
+.pw-sidebar nav a{
+    color:#cbd5e1;
+}
+
+.pw-sidebar nav a.active{
+    color:#dc2626;
+}
+
+.pw-sidebar nav a:hover{
+    color:#ffffff;
+}
+
+
+/* REQUIRED FIELD STAR */
+label.required::after{
+    content:" *";
+    color:#dc2626;
+    font-weight:700;
+}
+
+/* RED TITLE */
+.pw-red-title{
+    color:#dc2626;
+    font-weight:700;
+}
+
+/* RED TEXT */
+.pw-red-text{
+    color:#dc2626;
+    font-weight:600;
+}
+.pw-red-title{
+    color:#dc2626;
+    font-weight:700;
+    letter-spacing:0.3px;
+}
+
+/* CENTER + SIZE FIX */
+
+.pw-report-container h2{
+    text-align:center;
+    font-size:26px;   /* 🔥 reduced (was 30px) */
+    margin-bottom:5px;
+}
+
+.pw-property-id{
+    text-align:center;
+    font-size:14px;   /* little smaller */
+    margin-top:4px;
+}
+
+/* ===== PAGE TITLE FIX ===== */
+
+.pw-content h2{
+    font-size:22px !important;   /* smaller */
+    font-weight:700;
+    color:#dc2626 !important;    /* red */
+    margin-bottom:20px;
+}
+
+/* ===== TABLE HEADER IMPROVEMENT ===== */
+
+.pw-table th{
+    font-size:15px !important;   /* bigger */
+    font-weight:700 !important;  /* bold */
+    color:#111827;
+    letter-spacing:0.3px;
+}
+.pw-content h2{
+    border-left:5px solid #dc2626;
+    padding-left:10px;
+}
+/* REMOVE RED BACKGROUND FROM FIRST COLUMN */
+.pw-table td:first-child {
+    background: transparent !important;
+}
+
+
+/* HEADER STYLE */
+.pw-table thead tr{
+    background:#f3f4f6;
+}
+
+.pw-table thead th{
+    font-size:15px;
+    font-weight:700;
+}
+
+/* BODY NORMAL TEXT */
+.pw-table tbody td{
+    font-weight:400 !important;
+}
+
+/* REMOVE LEFT RED LINE */
+.pw-content h2{
+    border-left:none !important;
+    padding-left:0 !important;
+}
+iframe[title="chat widget"]{
+    z-index: 9999 !important;
+}
+
+
+
+/* =========================================
+🔥 PERFECT MOBILE FIX (NO OVERLAP)
+========================================= */
+
+@media(max-width:768px){
+
+    /* APP WRAPPER */
+    .pw-app{
+        flex-direction:column;
+        overflow-x:hidden;
+    }
+
+    /* SIDEBAR FIX */
+    .pw-sidebar{
+        position:fixed;
+        left:-260px;
+        top:0;
+        height:100%;
+        width:260px;
+        z-index:9999;
+        transition:0.3s;
+    }
+
+    .pw-sidebar.open{
+        left:0;
+    }
+
+    /* MAIN CONTENT FIX */
+    .pw-main{
+        margin-left:0 !important;
+        width:100%;
+        overflow-x:hidden;
+    }
+
+    .pw-content{
+        padding:15px;
+        overflow-x:hidden;
+    }
+
+    /* 🔥 DASHBOARD CARDS FIX */
+    .pw-stats-grid{
+        grid-template-columns:1fr !important;
+        gap:12px;
+    }
+
+    .pw-stat-card{
+        width:100%;
+    }
+
+    /* 🔥 GRID FIX */
+    .pw-dashboard-grid{
+        grid-template-columns:1fr !important;
+    }
+
+    /* 🔥 ANY FLEX OVERFLOW FIX */
+    .pw-dashboard,
+    .pw-content,
+    .pw-main{
+        max-width:100%;
+        overflow-x:hidden;
+    }
+
+    /* 🔥 PREVENT RIGHT SHIFT */
+    body, html{
+        overflow-x:hidden;
+    }
+
+}
+
+/* 🔥 FORCE NO RIGHT SCROLL */
+body{
+    overflow-x:hidden;
+}
+
+/* RADIO BUTTON FIX */
+
+.pw-radio-group {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.pw-radio-group label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.pw-radio-group input[type="radio"] {
+    accent-color: #dc2626;
+    cursor: pointer;
 }

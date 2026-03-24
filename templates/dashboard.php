@@ -1,5 +1,10 @@
+
 <?php
-if (!is_user_logged_in()) return;
+
+if (!is_user_logged_in()) {
+    wp_redirect(home_url('/login'));
+    exit;
+}
 
 global $wpdb;
 $user_id = get_current_user_id();
@@ -12,7 +17,13 @@ $table = $wpdb->prefix . 'pw_properties';
 
 if (isset($_POST['pw_update_property'])) {
 
-    $wpdb->update(
+    if (!wp_verify_nonce($_POST['_wpnonce'], 'pw_update_property_nonce')) {
+        wp_die('Security check failed');
+    }
+
+    $property_id = intval($_POST['property_id']);
+
+    $updated = $wpdb->update(
         $table,
         [
             'property_name'   => sanitize_text_field($_POST['property_name']),
@@ -23,39 +34,66 @@ if (isset($_POST['pw_update_property'])) {
             'contact_number'  => sanitize_text_field($_POST['contact_number']),
             'address'         => sanitize_textarea_field($_POST['address']),
             'google_map'      => sanitize_text_field($_POST['google_map']),
+            'special_instructions' => sanitize_textarea_field($_POST['special_instructions']),
         ],
-        ['id' => intval($_POST['property_id'])]
+        [
+            'id' => $property_id,
+            'user_id' => $user_id
+        ]
     );
 
-    echo "<script>location.reload();</script>";
+ $success = false;
+
+if ($updated !== false) {
+    $success = true;
 }
+}
+
 
 
 /* =====================================================
    MODIFY PROPERTY PAGE
 ===================================================== */
+if (isset($_GET['view']) && isset($_GET['modify'])) {
 
-if (isset($_GET['view']) && isset($_GET['modify'])):
+    $property_id = intval($_GET['view']);
 
-$property_id = intval($_GET['view']);
+    $prop = $wpdb->get_row(
+        $wpdb->prepare(
+            "SELECT * FROM $table WHERE id = %d AND user_id = %d",
+            $property_id,
+            $user_id
+        )
+    );
 
-$prop = $wpdb->get_row(
-    $wpdb->prepare(
-        "SELECT * FROM $table WHERE id = %d AND user_id = %d",
-        $property_id,
-        $user_id
-    )
-);
-
-if (!$prop) return;
+    if (!$prop) {
+        echo "<p>Property not found ❌</p>";
+    } else {
 ?>
 
 <div class="pw-property-detail-card">
 
+<?php if (!empty($success)): ?>
+<div id="pw-toast" class="pw-toast success">
+    Property updated successfully ✅
+</div>
+<?php endif; ?>
+
+<div class="pw-top-bar">
+
+    <a href="<?php echo home_url('/customer-dashboard?tab=my-properties&view=' . $prop->id); ?>" class="pw-back-link">
+        ←
+    </a>
+
+</div>
 <h2>Property Details</h2>
+<br>
 
 <form method="post">
 
+<?php wp_nonce_field('pw_update_property_nonce'); ?>
+
+<input type="hidden" name="pw_update_property" value="1">
 <input type="hidden" name="property_id" value="<?php echo $prop->id; ?>">
 
 <div class="pw-grid-3">
@@ -104,25 +142,28 @@ if (!$prop) return;
 <label>Google Map</label>
 <input type="text" name="google_map" value="<?php echo esc_attr($prop->google_map); ?>">
 </div>
-
+<div class="full">
+<label>Special Instructions</label>
+<textarea name="special_instructions"><?php echo esc_textarea($prop->special_instructions); ?></textarea>
+</div>
 </div>
 
+
 <button type="submit" name="pw_update_property" class="pw-btn">
-Update Property
+    Update Property
 </button>
 
-<a href="<?php echo home_url('/customer-dashboard?tab=my-properties&view='.$prop->id); ?>" 
-class="pw-small-btn">
-Back
-</a>
+
 
 </form>
 
 </div>
 
 <?php
+
+}
 return;
-endif;
+}
 
 
 
@@ -157,7 +198,11 @@ $visits = $wpdb->get_results(
 ?>
 
 <div class="pw-property-detail-card">
-
+<div class="pw-top-bar">
+    <a href="<?php echo home_url('/customer-dashboard?tab=my-properties'); ?>" class="pw-back-link">
+        ←
+    </a>
+</div>
 <h2><?php echo esc_html($prop->property_name); ?></h2>
 
 <div class="pw-property-actions">
@@ -214,6 +259,7 @@ $card='pw-card-next';
 
 ?>
 
+
 <?php if($clickable): ?>
 
 <a class="pw-action-card <?php echo $card;?>"
@@ -246,11 +292,6 @@ Visit <?php echo $i+1; ?><br>
 <?php endif; ?>
 
 </div>
-
-<a href="<?php echo home_url('/customer-dashboard?tab=my-properties'); ?>" 
-class="pw-small-btn">
-Back
-</a>
 
 </div>
 
@@ -367,3 +408,5 @@ No active properties found.
 </div>
 
 <?php endif; ?>
+
+

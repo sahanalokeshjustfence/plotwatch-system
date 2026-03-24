@@ -20,8 +20,25 @@ define('PW_URL', plugin_dir_url(__FILE__));
 define('PW_VERSION', '2.2');
 define('PW_DB_VERSION', '1.5');
 
-define('PW_WHATSAPP_TOKEN','EAALB4ZBAjTKwBQxuN9GQPZAwiPWZBnkI8gPvJtYfppQ5zvjLz70DcAIUo6GsZCKRLD88SLv4IGMZBXEYr6buPKBDYpylI7aLqorQy1rvURnjyjNsT3cxCqATcx1RvlWizlT5rMxhZBKf8yBuTZBREOLUhZCXW6HsQHZAXIu1Xx2zrJCiRPTqYKzhwoOOCxY0BgRJIzyuH6vYHZCiNCKVt28FpjYHpvPYn7oa8dSy9feUSMPsEKNA5hypI2MNJeNzObvgsxU0ZAWP5TN6r60kEjyFb67gInDDZCAZD');
+define('PW_WHATSAPP_TOKEN','EAALB4ZBAjTKwBRNAIRIXVHKPEnSxiuxtPcZCIKPkYcvBRZAo1zanvapZArWUkgXaZC6egVBZBTHqBLPEFtEcOcxmlCZCH3CEg70ZBrt494nbmbf0PhdCzmBphweiwYyA1XlSu8H6ZBTOKGleUodmIU2pyYPxSFZAP4zin1ZBI1QSoOw1COZBP98CH7BTVEgQoxZAxkAZDZD');
 define('PW_PHONE_ID','1002191049648645');
+
+function pw_is_app_page(){
+    return is_page([
+        'login',
+        'register',
+        'forgot-password',
+        'reset-password',
+        'customer-dashboard',
+        'customer-profile',
+        'operation-dashboard',
+        'engineer-dashboard',
+        'assign-package',
+        'add-property',
+        'customer-profile',
+        'manage-addons'
+    ]);
+}
 
 /*
 |--------------------------------------------------------------------------
@@ -223,7 +240,7 @@ require_once PW_PATH.'includes/helper-notifications.php';
 
 add_action('wp_enqueue_scripts', function () {
 
-    wp_enqueue_style('pw-style', PW_URL . 'assets/css/style.css', [], PW_VERSION);
+   // wp_enqueue_style('pw-style', PW_URL . 'assets/css/style.css', [], PW_VERSION);
 
     wp_enqueue_script('pw-script', PW_URL . 'assets/js/main.js', ['jquery'], PW_VERSION, true);
 
@@ -291,7 +308,7 @@ add_action('wp_footer', 'pw_global_footer');
 
 function pw_global_footer() {
 
-    if (is_admin()) return; // hide in admin panel
+       if (is_admin() || pw_is_app_page()) return;
 
     echo '<div class="pw-footer-global">'.date('Y').' © Dextra Square Private Limited</div>';
 
@@ -509,6 +526,10 @@ if(is_page(['login','register','forgot-password','reset-password'])){
 add_action('wp_footer','pw_support_widget');
 
 function pw_support_widget(){
+
+    // 🔥 ADD THIS LINE
+    //if(pw_is_app_page()) return;
+
 ?>
 
 <div class="pw-support-toggle">
@@ -642,24 +663,25 @@ add_action('shutdown',function(){
 
 });
 
+
+
 add_action('wp_footer','pw_tawk_chat');
 
 function pw_tawk_chat(){
 
-if(!is_user_logged_in()){
+    // 🔥 FIRST LINE (VERY IMPORTANT)
+    if(!pw_is_app_page()) return;
 
-$name = '';
-$email = '';
-$role = '';
-
-}else{
-
-$user = wp_get_current_user();
-$name = $user->display_name;
-$email = $user->user_email;
-$role = implode(",", $user->roles);
-
-}
+    if(!is_user_logged_in()){
+        $name = '';
+        $email = '';
+        $role = '';
+    }else{
+        $user = wp_get_current_user();
+        $name = $user->display_name;
+        $email = $user->user_email;
+        $role = implode(",", $user->roles);
+    }
 ?>
 
 <script>
@@ -668,13 +690,16 @@ var Tawk_API = Tawk_API || {};
 
 Tawk_API.onLoad = function(){
 
-Tawk_API.setAttributes({
+    Tawk_API.setAttributes({
 
-'name' : '<?php echo esc_js($name); ?>',
-'email' : '<?php echo esc_js($email); ?>',
-'role' : '<?php echo esc_js($role); ?>'
+        name : '<?php echo esc_js($name); ?>',
+        email : '<?php echo esc_js($email); ?>',
+        role : '<?php echo esc_js($role); ?>'
 
-}, function(error){});
+    }, function(error){});
+
+    // ✅ MOVE TO LEFT (THIS WAS MISSING)
+    Tawk_API.setPosition('left');
 
 };
 
@@ -694,3 +719,67 @@ s0.parentNode.insertBefore(s1,s0);
 
 <?php
 }
+
+add_action('wp_enqueue_scripts', function(){
+
+    if (is_page([
+        'login',
+        'register',
+        'forgot-password',
+        'reset-password',
+        'customer-dashboard',
+        'operation-dashboard',
+        'engineer-dashboard',
+        'assign-package',
+        'add-property',
+        'customer-profile',
+        'manage-addons'
+    ])) {
+
+        // 🔥 remove only theme + wp styles
+        wp_dequeue_style('astra-theme-css');
+        wp_dequeue_style('astra-child-theme-css');
+        wp_dequeue_style('global-styles');
+        wp_dequeue_style('wp-block-library');
+
+    }
+
+}, 100);
+
+
+add_action('wp_enqueue_scripts', function(){
+
+    wp_enqueue_style(
+        'pw-style',
+        PW_URL . 'assets/css/style.css',
+        [],
+        time() // 🔥 no cache
+    );
+
+}, 999);
+/* ====================================
+BLOCK EXTERNAL MODALS / SCRIPTS
+==================================== */
+
+add_action('wp_footer', function(){
+
+    // 🔥 STOP ALL UNKNOWN FOOTER INJECTIONS
+    if(pw_is_app_page()){
+
+        // remove modal if injected
+        echo "<script>
+        document.addEventListener('DOMContentLoaded', function(){
+
+            let modal = document.getElementById('open-modal');
+            if(modal) modal.remove();
+
+            document.querySelectorAll('.modal-window, .wrapper').forEach(el => el.remove());
+
+        });
+        </script>";
+
+        return;
+    }
+
+}, 1);
+

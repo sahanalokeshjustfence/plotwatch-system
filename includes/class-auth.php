@@ -201,7 +201,79 @@ class PW_Auth {
 
             $verify_link = home_url('/?pw_verify=1&uid=' . $user_id . '&token=' . $token);
 
-            wp_mail($email, "Verify Your Account - PlotWatch", "Click: ".$verify_link);
+         $subject = "Verify Your Account - PlotWatch";
+
+$message = '
+<html>
+<head>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    padding: 20px;
+}
+.container {
+    max-width: 500px;
+    margin: auto;
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+}
+h2 {
+    color: #dc2626;
+}
+p {
+    color: #555;
+    font-size: 14px;
+}
+.btn {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 12px 25px;
+    background: #dc2626;
+    color: #ffffff !important;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+}
+.footer {
+    margin-top: 20px;
+    font-size: 12px;
+    color: #999;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+    <h2>Verify Your Email</h2>
+
+    <p>Welcome to <strong>PlotWatch</strong> 👋</p>
+
+    <p>Please click the button below to verify your account.</p>
+
+    <a href="'.$verify_link.'" class="btn">Verify Email</a>
+
+    <p>If button is not working, copy below link:</p>
+
+    <p style="word-break:break-all;">
+        '.$verify_link.'
+    </p>
+
+    <div class="footer">
+        © PlotWatch by JustFence
+    </div>
+</div>
+</body>
+</html>
+';
+
+$headers = [
+    'Content-Type: text/html; charset=UTF-8'
+];
+
+wp_mail($email, $subject, $message, $headers);
 
             wp_safe_redirect(home_url('/login?registered=1'));
             exit;
