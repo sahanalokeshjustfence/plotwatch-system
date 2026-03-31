@@ -156,18 +156,74 @@ $property_id
 )
 );
 
-/* GENERATE STATUS */
+/* ================= CORRECT STATUS LOGIC ================= */
 
-if($completed >= $total){
+/* GET ALL VISITS ORDERED */
 
-$status = "Subscription Completed";
+$all_visits = $wpdb->get_results(
+    $wpdb->prepare(
+        "SELECT * FROM {$wpdb->prefix}pw_visits 
+         WHERE property_id=%d 
+         ORDER BY visit_date ASC",
+        $property_id
+    )
+);
 
-}else{
+$current_index = 0;
+$current_visit = null;
 
-$next = $completed + 1;
+/* FIND FIRST NOT COMPLETED VISIT */
 
-$status = "Visit ".$next."/".$total." Scheduled";
+foreach ($all_visits as $i => $v) {
 
+    if ($v->visit_status != 'Completed') {
+        $current_index = $i + 1;
+        $current_visit = $v;
+        break;
+    }
+}
+
+/* ALL COMPLETED */
+
+if (!$current_visit) {
+
+    $status = "Subscription Completed";
+
+} else {
+
+    $today = date('Y-m-d');
+
+    if ($current_visit->visit_status == 'Scheduled') {
+
+        $status = "Visit " . $current_index . "/" . $total . " Scheduled";
+
+    } else {
+
+        /* NOT SCHEDULED */
+
+        if ($current_visit->visit_date <= $today) {
+
+            $status = "Visit " . $current_index . "/" . $total . " Pending";
+
+        } else {
+
+            /* FUTURE → SHOW LAST COMPLETED */
+
+            $last_completed = 0;
+
+            foreach ($all_visits as $j => $v2) {
+                if ($v2->visit_status == 'Completed') {
+                    $last_completed = $j + 1;
+                }
+            }
+
+            if ($last_completed > 0) {
+                $status = "Visit " . $last_completed . "/" . $total . " Completed";
+            } else {
+                $status = "Visits Created";
+            }
+        }
+    }
 }
 
 /* UPDATE PROPERTY TABLE */

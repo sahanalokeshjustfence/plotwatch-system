@@ -147,7 +147,7 @@ class="<?php echo ($tab === 'visits') ? 'active' : ''; ?>">
 <div class="pw-mobile-menu" onclick="toggleSidebar()">☰</div>
 
 <div>
-Welcome, <?php echo esc_html($user->display_name); ?>
+Welcome, <span class="pw-username"><?php echo esc_html($user->display_name); ?></span>
 </div>
 
 <a class="pw-logout"

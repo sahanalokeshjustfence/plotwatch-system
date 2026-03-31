@@ -1,32 +1,33 @@
 <?php
+
 if (!defined('ABSPATH')) exit;
 
-$error_code = isset($_GET['error']) ? sanitize_text_field($_GET['error']) : '';
-$error_code = trim($error_code,"/"); // IMPORTANT FIX
+$error_code = sanitize_key($_REQUEST['error'] ?? '');
 $error = '';
 
 if($error_code){
 
-switch($error_code){
+    switch($error_code){
 
-case 'invalid':
-$error = "Invalid email or password.";
-break;
+        case 'invalid':
+            $error = "Invalid email or password.";
+        break;
 
-case 'not_verified':
-$error = "Please verify your email before logging in.";
-break;
-case 'captcha':
-$error = "Please complete captcha verification.";
-break;
-case 'blocked':
-$error = "Too many login attempts. Try again after 15 minutes.";
-break;
+        case 'not_verified':
+            $error = "Please verify your email before logging in.";
+        break;
 
-default:
-$error = "Login failed. Please try again.";
+        case 'captcha':
+            $error = "Please complete captcha verification.";
+        break;
 
-}
+        case 'blocked':
+            $error = "Too many login attempts. Try again after 15 minutes.";
+        break;
+
+        default:
+            $error = "Login failed. Please try again.";
+    }
 
 }
 ?>
@@ -40,9 +41,53 @@ class="pw-auth-logo">
 
 <h2>Welcome Back</h2>
 
+<!-- ✅ ERROR MESSAGE -->
 <?php if(!empty($error)): ?>
-<div class="pw-error"><?php echo esc_html($error); ?></div>
+<div style="
+background:#ffe6e6;
+color:#b30000;
+padding:12px;
+border-radius:8px;
+margin-bottom:15px;
+text-align:center;
+font-weight:500;
+">
+<?php echo esc_html($error); ?>
+</div>
 <?php endif; ?>
+
+
+<!-- ✅ SUCCESS: REGISTER -->
+<?php if(isset($_REQUEST['registered'])): ?>
+<div style="
+background:#e6ffed;
+color:#006b2e;
+padding:12px;
+border-radius:8px;
+margin-bottom:15px;
+text-align:center;
+font-weight:500;
+">
+Registration successful. Please verify your email before login.
+</div>
+<?php endif; ?>
+
+
+<!-- ✅ SUCCESS: VERIFIED -->
+<?php if(isset($_REQUEST['verified'])): ?>
+<div style="
+background:#e6ffed;
+color:#006b2e;
+padding:12px;
+border-radius:8px;
+margin-bottom:15px;
+text-align:center;
+font-weight:500;
+">
+Email verified successfully. You can login now.
+</div>
+<?php endif; ?>
+
 
 <form method="post">
 
@@ -64,15 +109,6 @@ required>
 <span class="pw-eye" onclick="toggleLoginPass()">👁</span>
 
 </div>
-<?php
-$email = isset($_POST['email']) ? sanitize_email($_POST['email']) : ($_GET['email'] ?? '');
-$auth = isset($GLOBALS['pw_auth']) ? $GLOBALS['pw_auth'] : new PW_Auth();
-
-if (!empty($email) && $auth->should_show_captcha($email)) :
-?>
-    <div class="g-recaptcha" data-sitekey="6Ld2y48sAAAAAAVEeIjTjIy8a26zU8Nzd-7Y9EBQ"></div>
-<?php endif; ?>
-
 
 
 <div class="pw-forgot">
@@ -97,35 +133,15 @@ Register
 </div>
 
 </div>
-<script src="https://www.google.com/recaptcha/api.js" async defer></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<?php if($error_code == 'invalid'): ?>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-
-Swal.fire({
-icon:'error',
-title:'Login Failed',
-text:'Invalid email or password.',
-confirmButtonColor:'#e31c3d'
-});
-
-});
-</script>
-<?php endif; ?>
 
 <script>
-
 function toggleLoginPass(){
-var x=document.getElementById("pw_login_pass");
+    var x = document.getElementById("pw_login_pass");
 
-if(x.type==="password"){
-x.type="text";
-}else{
-x.type="password";
+    if(x.type === "password"){
+        x.type = "text";
+    } else {
+        x.type = "password";
+    }
 }
-
-}
-
 </script>

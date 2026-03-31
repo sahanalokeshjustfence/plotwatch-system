@@ -78,6 +78,24 @@ pw_log("Package assigned to property ".$property_id." by operation member ".get_
 
 $subscription_id = $wpdb->insert_id;
 
+
+/* ================= SEND CUSTOMER NOTIFICATION ================= */
+
+/* ================= SEND NOTIFICATION ================= */
+
+$new_subscription = $wpdb->get_row(
+    $wpdb->prepare(
+        "SELECT * FROM {$wpdb->prefix}pw_subscriptions WHERE id=%d",
+        $subscription_id
+    )
+);
+
+if($new_subscription){
+    pw_notify_customer_package($property,$new_subscription);
+}else{
+    error_log('[PACKAGE ERROR] Subscription not found');
+}
+
 /* ================= RECREATE VISITS ================= */
 
 // Delete old visits
@@ -170,25 +188,79 @@ $total_visits = $wpdb->get_var(
     )
 );
 
-$completed_visits = $wpdb->get_var(
-$wpdb->prepare(
-"SELECT COUNT(*) FROM {$wpdb->prefix}pw_visits 
-WHERE property_id=%d AND visit_status='Completed'",
-$property_id
-)
+
+
+/* ================= CORRECT STATUS LOGIC ================= */
+
+$all_visits = $wpdb->get_results(
+    $wpdb->prepare(
+        "SELECT * FROM {$wpdb->prefix}pw_visits 
+         WHERE property_id=%d 
+         ORDER BY visit_date ASC",
+        $property_id
+    )
 );
 
-$scheduled_visits = $wpdb->get_var(
-$wpdb->prepare(
-"SELECT COUNT(*) FROM {$wpdb->prefix}pw_visits 
-WHERE property_id=%d AND visit_status='Scheduled'",
-$property_id
-)
-);
+$current_index = 0;
+$current_visit = null;
 
-$current = $completed_visits + $scheduled_visits;
+/* FIND FIRST NOT COMPLETED VISIT */
 
-$status = "Visit " . $current . "/" . $total_visits . " Scheduled";
+foreach ($all_visits as $i => $v) {
+
+    if ($v->visit_status != 'Completed') {
+        $current_index = $i + 1;
+        $current_visit = $v;
+        break;
+    }
+}
+
+/* ALL COMPLETED */
+
+if (!$current_visit) {
+
+    $status = "Subscription Completed";
+
+} else {
+
+    $today = date('Y-m-d');
+
+    if ($current_visit->visit_status == 'Scheduled') {
+
+        $status = "Visit " . $current_index . "/" . $total_visits . " Scheduled";
+
+    } else {
+
+        /* NOT SCHEDULED */
+
+        if ($current_visit->visit_date <= $today) {
+
+            $status = "Visit " . $current_index . "/" . $total_visits . " Pending";
+
+        } else {
+
+            /* FUTURE → SHOW LAST COMPLETED */
+
+            $last_completed = 0;
+
+            foreach ($all_visits as $j => $v2) {
+                if ($v2->visit_status == 'Completed') {
+                    $last_completed = $j + 1;
+                }
+            }
+
+            if ($last_completed > 0) {
+                $status = "Visit " . $last_completed . "/" . $total_visits . " Completed";
+            } else {
+                $status = "Visits Created";
+            }
+        }
+    }
+}
+
+/* UPDATE PROPERTY STATUS */
+
+
 
 $wpdb->update(
     "{$wpdb->prefix}pw_properties",

@@ -25,13 +25,23 @@
     cursor: pointer;
 }
 
-/* FIX INPUT */
 .pw-app input[type="text"],
 .pw-app input[type="number"],
 .pw-app input[type="date"],
 .pw-app select,
 .pw-app textarea {
-    all: unset;
+
+    width: 100%;
+    padding: 12px 14px;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    font-size: 14px;
+    font-family: 'Poppins', sans-serif;
+
     box-sizing: border-box;
 }
 
@@ -3836,4 +3846,17 @@ body{
 .pw-radio-group input[type="radio"] {
     accent-color: #dc2626;
     cursor: pointer;
+}
+
+.pw-app input:focus,
+.pw-app select:focus,
+.pw-app textarea:focus {
+    outline: none;
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgba(220,38,38,0.15);
+}
+
+.pw-username {
+    font-weight: 600;
+    color: #000; /* black */
 }

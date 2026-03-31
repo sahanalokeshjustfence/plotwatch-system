@@ -41,10 +41,13 @@ if (!is_user_logged_in()) return;
                 <label class="required">Property Type </label>
                 <select name="property_type" required>
                     <option value="">Select Property Type</option>
+                    <option value="Land">Land</option>
+                    <option value="Plot">Plot</option>
                     <option value="Residential">Residential</option>
                     <option value="Commercial">Commercial</option>
-                    <option value="Land">Land</option>
                     <option value="Warehouse">Warehouse</option>
+                    <option value="Openland">Openland</option>
+                    <option value="Industrialarea">Industrial area</option>
                 </select>
             </div>
 

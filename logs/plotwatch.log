@@ -168,3 +168,95 @@ Stack trace:
 [2026-03-24 11:24:36] [ERROR] PHP ERROR: Constant WP_DEBUG_DISPLAY already defined | File: C:\xampp\htdocs\plotwatch\wp-config.php | Line: 106
 [2026-03-24 11:27:57] [PROPERTY] Property created ID: 4 by user 3
 [2026-03-24 11:34:46] [PROPERTY] Property created ID: 5 by user 3
+[2026-03-26 06:02:49] [LOGIN] User login success: sahanalokeshjustfence17@gmail.com | Role: customer
+[2026-03-26 06:07:37] [PROPERTY] Property created ID: 6 by user 3
+[2026-03-26 06:08:42] [LOGIN] User login success: sahanalokesh80@gmail.com | Role: operation_member
+[2026-03-26 06:10:07] [PACKAGE] Package assigned to property 6 by operation member 4
+[2026-03-26 06:10:07] [VISIT_CREATE] Auto visit created ID 1 for property 6 on 2026-03-27
+[2026-03-26 06:10:07] [VISIT_CREATE] Auto visit created ID 2 for property 6 on 2026-04-27
+[2026-03-26 06:10:07] [VISIT_CREATE] Auto visit created ID 3 for property 6 on 2026-05-27
+[2026-03-26 06:10:07] [VISIT_CREATE] Auto visit created ID 4 for property 6 on 2026-06-27
+[2026-03-26 06:10:07] [VISIT_CREATE] Auto visit created ID 5 for property 6 on 2026-07-27
+[2026-03-26 06:10:07] [VISIT_CREATE] Auto visit created ID 6 for property 6 on 2026-08-27
+[2026-03-26 06:10:07] [VISIT_CREATE] Auto visit created ID 7 for property 6 on 2026-09-27
+[2026-03-26 06:10:07] [VISIT_CREATE] Auto visit created ID 8 for property 6 on 2026-10-27
+[2026-03-26 06:10:07] [VISIT_CREATE] Auto visit created ID 9 for property 6 on 2026-11-27
+[2026-03-26 06:10:07] [VISIT_CREATE] Auto visit created ID 10 for property 6 on 2026-12-27
+[2026-03-26 06:10:07] [VISIT_CREATE] Auto visit created ID 11 for property 6 on 2027-01-27
+[2026-03-26 06:10:07] [VISIT_CREATE] Auto visit created ID 12 for property 6 on 2027-02-27
+[2026-03-26 06:11:16] [PACKAGE] Package assigned to property 6 by operation member 4
+[2026-03-26 06:11:16] [VISIT_CREATE] Auto visit created ID 13 for property 6 on 2026-03-26
+[2026-03-26 06:11:16] [VISIT_CREATE] Auto visit created ID 14 for property 6 on 2026-04-26
+[2026-03-26 06:11:16] [VISIT_CREATE] Auto visit created ID 15 for property 6 on 2026-05-26
+[2026-03-26 06:11:16] [VISIT_CREATE] Auto visit created ID 16 for property 6 on 2026-06-26
+[2026-03-26 06:11:16] [VISIT_CREATE] Auto visit created ID 17 for property 6 on 2026-07-26
+[2026-03-26 06:11:16] [VISIT_CREATE] Auto visit created ID 18 for property 6 on 2026-08-26
+[2026-03-26 06:11:16] [VISIT_CREATE] Auto visit created ID 19 for property 6 on 2026-09-26
+[2026-03-26 06:11:16] [VISIT_CREATE] Auto visit created ID 20 for property 6 on 2026-10-26
+[2026-03-26 06:11:17] [VISIT_CREATE] Auto visit created ID 21 for property 6 on 2026-11-26
+[2026-03-26 06:11:17] [VISIT_CREATE] Auto visit created ID 22 for property 6 on 2026-12-26
+[2026-03-26 06:11:17] [VISIT_CREATE] Auto visit created ID 23 for property 6 on 2027-01-26
+[2026-03-26 06:11:17] [VISIT_CREATE] Auto visit created ID 24 for property 6 on 2027-02-26
+[2026-03-26 06:12:03] [PACKAGE] Package assigned to property 5 by operation member 4
+[2026-03-26 06:12:03] [VISIT_CREATE] Auto visit created ID 25 for property 5 on 2026-03-26
+[2026-03-26 06:12:03] [VISIT_CREATE] Auto visit created ID 26 for property 5 on 2026-06-26
+[2026-03-26 06:12:03] [VISIT_CREATE] Auto visit created ID 27 for property 5 on 2026-09-26
+[2026-03-26 06:12:03] [VISIT_CREATE] Auto visit created ID 28 for property 5 on 2026-12-26
+[2026-03-26 06:12:48] [PACKAGE] Package assigned to property 4 by operation member 4
+[2026-03-26 06:12:48] [VISIT_CREATE] Auto visit created ID 29 for property 4 on 2026-03-25
+[2026-03-26 06:12:48] [VISIT_CREATE] Auto visit created ID 30 for property 4 on 2026-06-25
+[2026-03-26 06:12:48] [VISIT_CREATE] Auto visit created ID 31 for property 4 on 2026-09-25
+[2026-03-26 06:12:48] [VISIT_CREATE] Auto visit created ID 32 for property 4 on 2026-12-25
+[2026-03-26 06:13:43] [VISIT_ASSIGN] Visit 13 assigned to engineer 5 for property 6
+[2026-03-26 06:14:19] [LOGIN] User login success: sahanalokesh70@gmail.com | Role: engineer
+[2026-03-26 07:03:27] [LOGIN] Login failed for email: sahanalokeshjustfence17@gmail.com
+[2026-03-26 07:22:40] [LOGIN] Login failed for email: sahanalokeshjustfence17@gmail.com
+[2026-03-26 07:23:28] [LOGIN] Login failed for email: sahanalokeshjustfence17@gmail.com
+[2026-03-26 07:24:06] [LOGIN] Login failed for email: sahanalokeshjustfence17@gmail.com
+[2026-03-26 07:49:59] [REGISTER] Registration failed: email already exists sahanalokeshjustfence17@gmail.com
+[2026-03-26 07:55:20] [LOGIN] Login failed for email: sahanalokeshjustfence17@gmail.com
+[2026-03-26 08:12:31] [LOGIN] Login failed for email: sahanalokeshjustfence17@gmail.com
+[2026-03-26 09:35:55] [LOGIN] Login failed for email: 
+[2026-03-26 10:00:06] [LOGIN] User login success: sahanalokeshjustfence17@gmail.com | Role: customer
+[2026-03-26 10:00:21] [LOGIN] Login failed for email: sahanalokeshjustfence17@gmail.com
+[2026-03-26 10:04:09] [REGISTER] Registration failed: email already exists sahanalokeshjustfence17@gmail.com
+[2026-03-26 10:09:27] [REGISTER] New user registered: sahanalokesh1999@gmail.com | UserID: 6
+[2026-03-26 10:10:37] [LOGIN] Login failed for email: sahanalokesh1999@gmail.com
+[2026-03-26 10:10:54] [VERIFY] Account verified for userID: 6
+[2026-03-26 10:11:25] [LOGIN] User login success: sahanalokesh1999@gmail.com | Role: customer
+[2026-03-26 10:50:26] [PACKAGE] Package assigned to property 3 by operation member 4
+[2026-03-26 10:50:27] [INFO] FATAL ERROR: Uncaught TypeError: json_decode(): Argument #1 ($json) must be of type string, array given in C:\xampp\htdocs\plotwatch\wp-content\plugins\plotwatch-system\templates\assign-package.php:118
+Stack trace:
+#0 C:\xampp\htdocs\plotwatch\wp-content\plugins\plotwatch-system\templates\assign-package.php(118): json_decode(Array, true)
+#1 C:\xampp\htdocs\plotwatch\wp-content\plugins\plotwatch-system\templates\layout.php(221): include('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\plotwatch\wp-includes\template-loader.php(132): include('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\plotwatch\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#4 C:\xampp\htdocs\plotwatch\index.php(17): require('C:\\xampp\\htdocs...')
+#5 {main}
+  thrown | File: C:\xampp\htdocs\plotwatch\wp-content\plugins\plotwatch-system\templates\assign-package.php | Line: 118
+[2026-03-26 10:54:38] [LOGIN] User login success: sahanalokeshjustfence17@gmail.com | Role: customer
+[2026-03-26 11:06:25] [PACKAGE] Package assigned to property 3 by operation member 4
+[2026-03-26 11:06:27] [INFO] FATAL ERROR: Uncaught Error: Call to undefined function pw_send_package_whatsapp() in C:\xampp\htdocs\plotwatch\wp-content\plugins\plotwatch-system\templates\assign-package.php:137
+Stack trace:
+#0 C:\xampp\htdocs\plotwatch\wp-content\plugins\plotwatch-system\templates\layout.php(221): include()
+#1 C:\xampp\htdocs\plotwatch\wp-includes\template-loader.php(132): include('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\plotwatch\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\plotwatch\index.php(17): require('C:\\xampp\\htdocs...')
+#4 {main}
+  thrown | File: C:\xampp\htdocs\plotwatch\wp-content\plugins\plotwatch-system\templates\assign-package.php | Line: 137
+[2026-03-26 11:11:42] [PACKAGE] Package assigned to property 2 by operation member 4
+[2026-03-26 11:11:42] [INFO] FATAL ERROR: Uncaught Error: Call to undefined function pw_send_package_whatsapp() in C:\xampp\htdocs\plotwatch\wp-content\plugins\plotwatch-system\templates\assign-package.php:137
+Stack trace:
+#0 C:\xampp\htdocs\plotwatch\wp-content\plugins\plotwatch-system\templates\layout.php(221): include()
+#1 C:\xampp\htdocs\plotwatch\wp-includes\template-loader.php(132): include('C:\\xampp\\htdocs...')
+#2 C:\xampp\htdocs\plotwatch\wp-blog-header.php(19): require_once('C:\\xampp\\htdocs...')
+#3 C:\xampp\htdocs\plotwatch\index.php(17): require('C:\\xampp\\htdocs...')
+#4 {main}
+  thrown | File: C:\xampp\htdocs\plotwatch\wp-content\plugins\plotwatch-system\templates\assign-package.php | Line: 137
+[2026-03-26 11:20:34] [PROPERTY] Property created ID: 7 by user 3
+[2026-03-26 11:38:38] [PROPERTY] Property created ID: 8 by user 3
+[2026-03-26 11:39:35] [PACKAGE] Package assigned to property 8 by operation member 4
+[2026-03-26 11:39:42] [VISIT_CREATE] Auto visit created ID 33 for property 8 on 2026-03-26
+[2026-03-26 11:39:42] [VISIT_CREATE] Auto visit created ID 34 for property 8 on 2026-06-26
+[2026-03-26 11:39:42] [VISIT_CREATE] Auto visit created ID 35 for property 8 on 2026-09-26
+[2026-03-26 11:39:42] [VISIT_CREATE] Auto visit created ID 36 for property 8 on 2026-12-26

@@ -15,18 +15,7 @@ class PW_Auth {
         add_filter('authenticate', [$this, 'block_unverified'], 30, 3);
     }
     
-    // 🤖 CAPTCHA TRIGGER LOGIC
-    public function should_show_captcha($email) {
-        $ip = $_SERVER['REMOTE_ADDR'];
-
-        $email_key = 'pw_login_email_' . md5($email);
-        $ip_key    = 'pw_login_ip_' . md5($ip);
-
-        $email_attempts = get_transient($email_key) ?: 0;
-        $ip_attempts    = get_transient($ip_key) ?: 0;
-
-        return ($email_attempts >= 3 || $ip_attempts >= 5);
-    }
+    
 
     /*
     |--------------------------------------------------------------------------
@@ -44,30 +33,7 @@ class PW_Auth {
         // ✅ STEP 1: CHECK LOGIN ATTEMPTS
         $this->check_login_attempts($email);
 
-        // 🤖 CAPTCHA VALIDATION
-        if ($this->should_show_captcha($email)) {
-
-            $recaptcha = $_POST['g-recaptcha-response'] ?? '';
-
-            if (empty($recaptcha)) {
-                wp_safe_redirect(add_query_arg('error','captcha',home_url('/login')));
-                exit;
-            }
-
-            $response = wp_remote_post("https://www.google.com/recaptcha/api/siteverify", [
-                'body' => [
-                    'secret' => PW_RECAPTCHA_SECRET,
-                    'response' => $recaptcha
-                ]
-            ]);
-
-            $result = json_decode(wp_remote_retrieve_body($response));
-
-            if (!$result->success) {
-                wp_safe_redirect(add_query_arg('error','captcha',home_url('/login')));
-                exit;
-            }
-        }
+        
 
         $creds = [
             'user_login'    => $email,
@@ -77,16 +43,22 @@ class PW_Auth {
 
         $user = wp_signon($creds, false);
 
-        if (is_wp_error($user)) {
+       if (is_wp_error($user)) {
 
-            // ❌ STEP 2: RECORD FAILED ATTEMPT
-            $this->record_failed_attempt($email);
+    $this->record_failed_attempt($email);
 
-            pw_log("Login failed for email: ".$email,"LOGIN");
+    pw_log("Login failed for email: ".$email,"LOGIN");
 
-            wp_safe_redirect(add_query_arg('error','invalid',home_url('/login')));
-            exit;
-        }
+    $error_code = $user->get_error_code();
+
+    if($error_code == 'not_verified'){
+        wp_safe_redirect(home_url('/login?error=not_verified'));
+    } else {
+        wp_safe_redirect(home_url('/login?error=invalid'));
+    }
+
+    exit;
+}
 
         // ✅ STEP 3: CLEAR FAILED ATTEMPTS
         $this->clear_login_attempts($email);
