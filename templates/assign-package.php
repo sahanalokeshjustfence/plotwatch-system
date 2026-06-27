@@ -178,6 +178,51 @@ if (isset($_POST['assign_visit'])) {
         ],
         ['id'=>$visit_id]
     );
+    /* ================= SEND ENGINEER NOTIFICATION ================= */
+
+$engineer = get_user_by('id', $engineer_id);
+
+$profile_table = $wpdb->prefix . 'pw_profile';
+
+$engineer_phone = $wpdb->get_var(
+    $wpdb->prepare(
+        "SELECT mobile FROM $profile_table WHERE user_id=%d",
+        $engineer_id
+    )
+);
+
+if (!empty($engineer_phone)) {
+
+    $engineer_phone = str_replace('+', '', $engineer_phone);
+
+    if (strlen($engineer_phone) == 10) {
+        $engineer_phone = '91' . $engineer_phone;
+    }
+}
+
+$visit_number = $wpdb->get_var(
+    $wpdb->prepare(
+        "SELECT COUNT(*) 
+         FROM {$wpdb->prefix}pw_visits
+         WHERE property_id=%d
+         AND id<=%d",
+        $property_id,
+        $visit_id
+    )
+);
+
+if ($engineer && !empty($engineer_phone)) {
+
+    pw_notify_engineer_visit(
+        $engineer,
+        $engineer_phone,
+        $property,
+        "Visit ".$visit_number,
+        $visit_date
+    );
+
+}
+
     pw_log("Visit ".$visit_id." assigned to engineer ".$engineer_id." for property ".$property_id,"VISIT_ASSIGN");
     /* ================= UPDATE PROPERTY STATUS ================= */
 

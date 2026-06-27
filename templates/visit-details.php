@@ -236,6 +236,32 @@ $wpdb->prefix.'pw_properties',
 ['id'=>$property_id]
 );
 
+/* =====================================
+SEND VISIT COMPLETED NOTIFICATIONS
+===================================== */
+
+$property = $wpdb->get_row(
+    $wpdb->prepare(
+        "SELECT p.*, u.display_name, u.user_email
+         FROM {$wpdb->prefix}pw_properties p
+         LEFT JOIN {$wpdb->users} u
+         ON p.user_id = u.ID
+         WHERE p.id=%d",
+        $property_id
+    )
+);
+
+$engineer = wp_get_current_user();
+
+$visit_number = "Visit ".$completed;
+
+pw_notify_visit_completed(
+    $property,
+    $engineer,
+    $visit_number,
+    $actual_date
+);
+
 echo "<script>window.location.href='".home_url('/update-visit?visit_id='.$visit_id)."';</script>";
 exit;
 

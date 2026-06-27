@@ -20,8 +20,7 @@ define('PW_URL', plugin_dir_url(__FILE__));
 define('PW_VERSION', '2.2');
 define('PW_DB_VERSION', '1.5');
 
-define('PW_WHATSAPP_TOKEN','EAALB4ZBAjTKwBRNAIRIXVHKPEnSxiuxtPcZCIKPkYcvBRZAo1zanvapZArWUkgXaZC6egVBZBTHqBLPEFtEcOcxmlCZCH3CEg70ZBrt494nbmbf0PhdCzmBphweiwYyA1XlSu8H6ZBTOKGleUodmIU2pyYPxSFZAP4zin1ZBI1QSoOw1COZBP98CH7BTVEgQoxZAxkAZDZD');
-define('PW_PHONE_ID','1002191049648645');
+define('PW_SKALEBOT_TOKEN', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb21wYW55SWQiOjU5MSwidXNlck5hbWUiOiJqdXN0ZmVuY2UiLCJpZCI6MTgzNywicm9sZSI6InN1cGVyYWRtaW4iLCJjaGlsZENvbXBhbnlJZHMiOm51bGwsImlhdCI6MTc0NTQ5NTM0Mn0.d5LeXjJJcI4DzErSygGi-NfuVgvHstrMHq2VPDTuCCc');
 
 function pw_is_app_page(){
     return is_page([
@@ -783,3 +782,26 @@ add_action('wp_footer', function(){
 
 }, 1);
 
+require_once plugin_dir_path(__FILE__) . 'includes/cron-visit-reminder.php';
+
+register_activation_hook(__FILE__, 'pw_schedule_visit_reminder');
+
+function pw_schedule_visit_reminder() {
+
+    if (!wp_next_scheduled('pw_visit_reminder_event')) {
+
+        $time = strtotime('today 16:00');
+
+        if ($time <= time()) {
+            $time = strtotime('tomorrow 16:00');
+        }
+
+        wp_schedule_event($time, 'daily', 'pw_visit_reminder_event');
+    }
+}
+
+register_deactivation_hook(__FILE__, 'pw_clear_visit_reminder');
+
+function pw_clear_visit_reminder() {
+    wp_clear_scheduled_hook('pw_visit_reminder_event');
+}
